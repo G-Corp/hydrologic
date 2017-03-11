@@ -41,11 +41,12 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 
 ```
 
--spec worker(data()) -> {map, data()}
+-spec worker(data(), ...) -> {map, data()}
                         | data()
                         | {filter, true | false}
                         | {return, data()}
                         | {error, term()}.
+-spec worker(data(), accumulator(), ...) -> {reduce, accumulator()}.
 
 ```
 

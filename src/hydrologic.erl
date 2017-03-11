@@ -33,7 +33,7 @@ run(Pipe, Data) ->
         name => Pipe,
         uuid => uuid:to_string(uuid:uuid4()),
         fan => -1,
-        flow => erlang:is_list(Data) andalso not bucs:is_string(Data),
+        flow => (erlang:is_list(Data) andalso not bucs:is_string(Data)) orelse bucs:is_list_of_lists(Data),
         data => Data,
         error => none},
       receive
@@ -127,8 +127,8 @@ worker({fanin, 0}, PID, EndPID) ->
 worker({fanin, 1}, PID, EndPID) ->
   worker({merge, fun(_, X) -> {map, X} end}, PID, EndPID);
 worker({duplicate, AltPID}, PID, EndPID) when ?IS_RECEIVER(AltPID),
-                                           ?IS_RECEIVER(PID),
-                                           ?IS_RECEIVER(EndPID) ->
+                                              ?IS_RECEIVER(PID),
+                                              ?IS_RECEIVER(EndPID) ->
   receive
     eof ->
       PID ! eof;
@@ -191,7 +191,7 @@ worker({{Module, Function, Args}, AltPID} = Worker, PID, EndPID) when is_atom(Mo
     #{flow := false} = Record ->
       response(PID, AltPID, EndPID, Record, {Module, Function, Args}),
       worker(Worker, PID, EndPID);
-      #{flow := true} = Record ->
+    #{flow := true} = Record ->
       flow_response(PID, AltPID, EndPID, Record, {Module, Function, Args}),
       worker(Worker, PID, EndPID)
   end;
@@ -246,7 +246,7 @@ worker({{Function, Args}, AltPID}, PID, EndPID) when is_atom(Function),
 response(PID, EndPID, #{data := Data} = Record, Function) ->
   case is_receiver(PID) of
     true ->
-      case callfun(Function, [Data]) of
+      case callfun2(Function, [Data]) of
         {map, NewData} ->
           PID ! Record#{data => NewData};
         {filter, true} ->
@@ -266,7 +266,7 @@ response(PID, EndPID, #{data := Data} = Record, Function) ->
 response(PID, AltPID, EndPID, #{data := Data} = Record, Function) ->
   case is_receiver(PID) of
     true ->
-      case callfun(Function, [Data]) of
+      case callfun2(Function, [Data]) of
         {map, NewData} ->
           PID ! Record#{data => NewData};
         {filter, true} ->
@@ -287,7 +287,7 @@ response(PID, AltPID, EndPID, #{data := Data} = Record, Function) ->
 flow_response(PID, EndPID, #{data := Data} = Record, Function) ->
   case is_receiver(PID) of
     true ->
-      case callfun(Data, Function, '$', [], []) of
+      case callfun5(Data, Function, '$', [], []) of
         {map, NewData, _} ->
           PID ! Record#{data => NewData};
         {filter, NewData, _} ->
@@ -303,7 +303,7 @@ flow_response(PID, EndPID, #{data := Data} = Record, Function) ->
 flow_response(PID, AltPID, EndPID, #{data := Data} = Record, Function) ->
   case is_receiver(PID) of
     true ->
-      case callfun(Data, Function, '$', [], []) of
+      case callfun5(Data, Function, '$', [], []) of
         {map, NewData, _} ->
           PID ! Record#{data => NewData};
         {filter, NewData0, NewData1} ->
@@ -332,13 +332,13 @@ merge(#{fan := Fan1, uuid := UUID, data := Data1, name := Name, flow := Flow} = 
     [{UUID, #{fan := Fan0, uuid := UUID, data := Data0, name := Name, flow := Flow}}] ->
       ets:delete(Name, UUID),
       NewData = case Flow of
-                  false -> callfun(Function,
-                                   case Fan0 < Fan1 of
-                                     true ->
-                                       [Data0, Data1];
-                                     false ->
-                                       [Data1, Data0]
-                                   end);
+                  false -> callfun2(Function,
+                                    case Fan0 < Fan1 of
+                                      true ->
+                                        [Data0, Data1];
+                                      false ->
+                                        [Data1, Data0]
+                                    end);
                   true ->
                     merge_flow(case Fan0 < Fan1 of
                                  true ->
@@ -361,47 +361,47 @@ merge(#{fan := Fan1, uuid := UUID, data := Data1, name := Name, flow := Flow} = 
       error
   end.
 
-callfun({Module, Function, Args0}, Args1) when is_atom(Module),
-                                               is_atom(Function),
-                                               is_list(Args0),
-                                               is_list(Args1) ->
-  callfun({Module, Function}, Args1 ++ Args0);
-callfun({Module, Function}, Args) when is_atom(Module),
-                                       is_atom(Function),
-                                       is_list(Args) ->
+callfun2({Module, Function, Args0}, Args1) when is_atom(Module),
+                                                is_atom(Function),
+                                                is_list(Args0),
+                                                is_list(Args1) ->
+  callfun2({Module, Function}, Args1 ++ Args0);
+callfun2({Module, Function}, Args) when is_atom(Module),
+                                        is_atom(Function),
+                                        is_list(Args) ->
   erlang:apply(Module, Function, Args);
-callfun({Function, Args0}, Args1) when is_list(Args0) andalso
-                                       is_list(Args1) andalso
-                                       is_function(Function, length(Args0) + length(Args1)) ->
-  callfun(Function, Args1 ++ Args0);
-callfun(Function, Args) when is_list(Args) andalso
-                             is_function(Function, length(Args)) ->
+callfun2({Function, Args0}, Args1) when is_list(Args0) andalso
+                                        is_list(Args1) andalso
+                                        is_function(Function, length(Args0) + length(Args1)) ->
+  callfun2(Function, Args1 ++ Args0);
+callfun2(Function, Args) when is_list(Args) andalso
+                              is_function(Function, length(Args)) ->
   erlang:apply(Function, Args).
 
-callfun([], _, Type, Acc0, Acc1) ->
+callfun5([], _, Type, Acc0, Acc1) ->
   {Type, lists:reverse(Acc0), lists:reverse(Acc1)};
-callfun(['$empty$'|Rest], Function, Type, Acc0, Acc1) ->
-  callfun(Rest, Function, Type, ['$empty$'|Acc0], Acc1);
-callfun([Data|Rest], Function, Type, Acc0, Acc1) ->
-  next_call(Data, Rest, Function, Type, Acc0, Acc1, callfun(Function, [Data])).
+callfun5(['$empty$'|Rest], Function, Type, Acc0, Acc1) ->
+  callfun5(Rest, Function, Type, ['$empty$'|Acc0], Acc1);
+callfun5([Data|Rest], Function, Type, Acc0, Acc1) ->
+  next_call(Data, Rest, Function, Type, Acc0, Acc1, callfun2(Function, [Data])).
 
 next_call(_, Rest, Function, Type0, Acc0, Acc1, {map, NewData}) when Type0 == map;
                                                                      Type0 == '$' ->
-  callfun(Rest, Function, map, [NewData|Acc0], Acc1);
+  callfun5(Rest, Function, map, [NewData|Acc0], Acc1);
 next_call(Data, Rest, Function, Type0, Acc0, Acc1, {filter, true}) when Type0 == filter;
                                                                         Type0 == '$' ->
-  callfun(Rest, Function, filter, [Data|Acc0], ['$empty$'|Acc1]);
+  callfun5(Rest, Function, filter, [Data|Acc0], ['$empty$'|Acc1]);
 next_call(Data, Rest, Function, Type0, Acc0, Acc1, {filter, false}) when Type0 == filter;
                                                                          Type0 == '$' ->
-  callfun(Rest, Function, filter, ['$empty$'|Acc0], [Data|Acc1]);
+  callfun5(Rest, Function, filter, ['$empty$'|Acc0], [Data|Acc1]);
 next_call(_, Rest, Function, Type0, Acc0, Acc1, {return, NewData}) when Type0 == return;
                                                                         Type0 == '$' ->
-  callfun(Rest, Function, return, [NewData|Acc0], Acc1);
+  callfun5(Rest, Function, return, [NewData|Acc0], Acc1);
 next_call(_, _, _, _, _, _, {error, _} = Error) ->
   Error;
 next_call(_, Rest, Function, Type0, Acc0, Acc1, Other) when Type0 == map;
                                                             Type0 == '$' ->
-  callfun(Rest, Function, map, [Other|Acc0], Acc1).
+  callfun5(Rest, Function, map, [Other|Acc0], Acc1).
 
 remove_empty([]) ->
   [];

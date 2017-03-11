@@ -1,2 +1,2 @@
-%{"bucs": {:git, "https://github.com/botsunit/bucs.git", "cdf75aa429e16e4fbd7c2109fbcba068478de1a5", [branch: "master"]},
+%{"bucs": {:git, "https://github.com/G-Corp/bucs.git", "cdf75aa429e16e4fbd7c2109fbcba068478de1a5", [branch: "master"]},
   "uuid": {:git, "https://github.com/botsunit/erlang-uuid.git", "f350d2baad17b80d1c7bde7397c381701a14e6a5", [tag: "0.7.2"]}}
