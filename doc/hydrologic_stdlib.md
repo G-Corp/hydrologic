@@ -20,59 +20,89 @@
 
 ### between/3 ###
 
-`between(Data, Min, Max) -> any()`
+<pre><code>
+between(Data::any(), Min::any(), Max::any()) -&gt; {filter, boolean()}
+</code></pre>
+<br />
 
 <a name="chop-2"></a>
 
 ### chop/2 ###
 
-`chop(Data, Size) -> any()`
+<pre><code>
+chop(Data::any(), Size::non_neg_integer()) -&gt; {map, any()}
+</code></pre>
+<br />
 
 <a name="console-1"></a>
 
 ### console/1 ###
 
-`console(Data) -> any()`
+<pre><code>
+console(Data::any()) -&gt; {map, any()}
+</code></pre>
+<br />
 
 <a name="console-2"></a>
 
 ### console/2 ###
 
-`console(Data, Format) -> any()`
+<pre><code>
+console(Data::any(), Format::string()) -&gt; {map, any()}
+</code></pre>
+<br />
 
 <a name="even-1"></a>
 
 ### even/1 ###
 
-`even(Data) -> any()`
+<pre><code>
+even(Data::integer()) -&gt; {filter, boolean()}
+</code></pre>
+<br />
 
 <a name="match-2"></a>
 
 ### match/2 ###
 
-`match(Data, Regex) -> any()`
+<pre><code>
+match(Data::any(), Regex::string() | binary()) -&gt; {filter, boolean()}
+</code></pre>
+<br />
 
 <a name="odd-1"></a>
 
 ### odd/1 ###
 
-`odd(Data) -> any()`
+<pre><code>
+odd(Data::integer()) -&gt; {filter, boolean()}
+</code></pre>
+<br />
 
 <a name="pad-3"></a>
 
 ### pad/3 ###
 
-`pad(Data, Size, Char) -> any()`
+<pre><code>
+pad(Data::any(), Size::non_neg_integer(), Char::integer()) -&gt; {map, any()}
+</code></pre>
+<br />
 
 <a name="pad-4"></a>
 
 ### pad/4 ###
 
-`pad(Data, X2, Size, Char) -> any()`
+<pre><code>
+pad(Data::any(), X2::right | left, Size::non_neg_integer(), Char::integer()) -&gt; {map, any()}
+</code></pre>
+<br />
 
 <a name="return-1"></a>
 
 ### return/1 ###
 
-`return(Data) -> any()`
+<pre><code>
+return(Data::any()) -&gt; {return, any()}
+</code></pre>
+<br />
 
