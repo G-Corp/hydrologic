@@ -12,6 +12,16 @@
 
 
 
+### <a name="type-accumulator">accumulator()</a> ###
+
+
+<pre><code>
+accumulator() = any()
+</code></pre>
+
+
+
+
 ### <a name="type-data">data()</a> ###
 
 

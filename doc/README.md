@@ -41,11 +41,12 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 
 ```
 
--spec worker(data()) -> {map, data()}
+-spec worker(data(), ...) -> {map, data()}
                         | data()
                         | {filter, true | false}
                         | {return, data()}
                         | {error, term()}.
+-spec worker(data(), accumulator(), ...) -> {reduce, accumulator()}.
 
 ```
 
@@ -96,16 +97,9 @@ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED WAR
 
 
 ### TODO ###
-* CORE: sort - (map, list)
-* CORE: count lines|chars|words - (map, list)
-* CORE: from fun(X) -> true|false end - (map, list)
-* CORE: to fun(X) -> true|false end - (map, list)
-* CORE: unique - (map, list)
-* CODE: head N - (map, list)
-* CODE: tail N - (map, list)
-* CODE: drop head|tail N - (map, list)
-* CODE: split Pattern - (map, elem->list)
-* CODE: join Separator - (map, list->elem)
+* STDLIB: drop head|tail N - (map, list)
+* STDLIB: split Pattern - (map, elem->list)
+* STDLIB: join Separator - (map, list->elem)
 * STDLIB: strip left|right|both - (map, elem)
 * STDLIB: replace Regex Repl - (map, elem)
 
@@ -115,5 +109,6 @@ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED WAR
 
 <table width="100%" border="0" summary="list of modules">
 <tr><td><a href="hydrologic.md" class="module">hydrologic</a></td></tr>
+<tr><td><a href="hydrologic_lib.md" class="module">hydrologic_lib</a></td></tr>
 <tr><td><a href="hydrologic_stdlib.md" class="module">hydrologic_stdlib</a></td></tr></table>
 

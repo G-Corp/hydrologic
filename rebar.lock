@@ -1,5 +1,5 @@
 [{<<"bucs">>,
-  {git,"https://github.com/botsunit/bucs.git",
+  {git,"https://github.com/G-Corp/bucs.git",
        {ref,"cdf75aa429e16e4fbd7c2109fbcba068478de1a5"}},
   0},
  {<<"uuid">>,
