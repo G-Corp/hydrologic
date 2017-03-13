@@ -8,9 +8,16 @@
          stop/1
         ]).
 
+-export_type([
+              accumulator/0
+             ]).
+
+-define(FLOW(Data), (erlang:is_list(Data) andalso not bucs:is_string(Data)) orelse bucs:is_list_of_lists(Data)).
+
 -type operation() :: term().
 -type pipe() :: atom().
 -type data() :: any().
+-type accumulator() :: any().
 
 % @doc
 % Create a new pipe.
@@ -33,7 +40,7 @@ run(Pipe, Data) ->
         name => Pipe,
         uuid => uuid:to_string(uuid:uuid4()),
         fan => -1,
-        flow => (erlang:is_list(Data) andalso not bucs:is_string(Data)) orelse bucs:is_list_of_lists(Data),
+        flow => ?FLOW(Data),
         data => Data,
         error => none},
       receive
@@ -248,7 +255,7 @@ response(PID, EndPID, #{data := Data} = Record, Function) ->
     true ->
       case callfun2(Function, [Data]) of
         {map, NewData} ->
-          PID ! Record#{data => NewData};
+          PID ! Record#{data => NewData, flow => ?FLOW(NewData)};
         {filter, true} ->
           PID ! Record;
         {filter, false} ->
@@ -268,7 +275,7 @@ response(PID, AltPID, EndPID, #{data := Data} = Record, Function) ->
     true ->
       case callfun2(Function, [Data]) of
         {map, NewData} ->
-          PID ! Record#{data => NewData};
+          PID ! Record#{data => NewData, flow => ?FLOW(NewData)};
         {filter, true} ->
           PID ! Record;
         {filter, false} ->
@@ -292,10 +299,14 @@ flow_response(PID, EndPID, #{data := Data} = Record, Function) ->
           PID ! Record#{data => NewData};
         {filter, NewData, _} ->
           PID ! Record#{data => NewData};
+        {reduce, NewData} ->
+          PID ! Record#{data => NewData, flow => ?FLOW(NewData)};
         {return, NewData, _} ->
           EndPID ! Record#{data => NewData};
         {error, Error} ->
-          EndPID ! Record#{error => Error}
+          EndPID ! Record#{error => Error};
+        {_, Data} ->
+          PID ! Record
       end;
     false ->
       EndPID ! Record#{error => invalid_pipe}
@@ -309,10 +320,14 @@ flow_response(PID, AltPID, EndPID, #{data := Data} = Record, Function) ->
         {filter, NewData0, NewData1} ->
           PID ! Record#{data => NewData0, fan => 0},
           AltPID ! Record#{data => NewData1, fan => 1};
+        {reduce, NewData} ->
+          PID ! Record#{data => NewData, flow => ?FLOW(NewData)};
         {return, NewData, _} ->
           EndPID ! Record#{data => NewData};
         {error, Error} ->
-          EndPID ! Record#{error => Error}
+          EndPID ! Record#{error => Error};
+        {_, Data} ->
+          PID ! Record
       end;
     false ->
       EndPID ! Record#{error => invalid_pipe}
@@ -378,6 +393,8 @@ callfun2(Function, Args) when is_list(Args) andalso
                               is_function(Function, length(Args)) ->
   erlang:apply(Function, Args).
 
+callfun5([], _, reduce, Acc, []) ->
+  {reduce, Acc};
 callfun5([], _, Type, Acc0, Acc1) ->
   {Type, lists:reverse(Acc0), lists:reverse(Acc1)};
 callfun5(['$empty$'|Rest], Function, Type, Acc0, Acc1) ->
@@ -397,11 +414,18 @@ next_call(Data, Rest, Function, Type0, Acc0, Acc1, {filter, false}) when Type0 =
 next_call(_, Rest, Function, Type0, Acc0, Acc1, {return, NewData}) when Type0 == return;
                                                                         Type0 == '$' ->
   callfun5(Rest, Function, return, [NewData|Acc0], Acc1);
+next_call(_, Rest, Function, '$', _, [], Reduce = {reduce, _}) ->
+  callfun5([], Function, reduce, reduce(Rest, Function, Reduce), []);
 next_call(_, _, _, _, _, _, {error, _} = Error) ->
   Error;
 next_call(_, Rest, Function, Type0, Acc0, Acc1, Other) when Type0 == map;
                                                             Type0 == '$' ->
   callfun5(Rest, Function, map, [Other|Acc0], Acc1).
+
+reduce([], _, {reduce, Acc}) ->
+  Acc;
+reduce([Data|Rest], Function, {reduce, Acc}) ->
+  reduce(Rest, Function, callfun2(Function, [Data, Acc])).
 
 remove_empty([]) ->
   [];

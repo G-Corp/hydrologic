@@ -194,5 +194,14 @@ hydrologic_stdlib_test_() ->
         ?assertCall(io, format, 2, 1),
         hydrologic:stop(test),
         meck:unload(io)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [sum]
+         ),
+        ?assertEqual({ok, 1+2+3+4},
+                     hydrologic:run(test, [1, 2, 3, 4])),
+        hydrologic:stop(test)
     end
    ]}.

@@ -18,6 +18,7 @@
 -export([
          odd/1
          , even/1
+         , sum/1, sum/2
         ]).
 
 % Common
@@ -76,3 +77,9 @@ even(Data) ->
 odd(Data) ->
   {filter, Data rem 2 /= 0}.
 
+-spec sum(integer()) -> {reduce, hydrologic:accumulator()}.
+sum(Data) ->
+  {reduce, Data}.
+-spec sum(integer(), hydrologic:accumulator()) -> {reduce, hydrologic:accumulator()}.
+sum(Data, Acc) ->
+  {reduce, Acc + Data}.
