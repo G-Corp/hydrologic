@@ -11,6 +11,7 @@
          , unique/1, unique/2
          , head/2, head/3
          , tail/2, tail/3
+         , drop/3, drop/4
         ]).
 
 -export([
@@ -47,8 +48,10 @@ console(Data, Format) ->
 sort(Data) ->
   {reduce, [Data]}.
 -spec sort(any(), hydrologic:accumulator()) -> {reduce, hydrologic:accumulator()}.
+sort('__end__', Acc) ->
+  {reduce, lists:sort(Acc)};
 sort(Data, Acc) ->
-  {reduce, lists:sort([Data|Acc])}.
+  {reduce, [Data|Acc]}.
 
 -spec from(any(), any()) -> {reduce, hydrologic:accumulator()}.
 from(Data, Data) ->
@@ -56,6 +59,8 @@ from(Data, Data) ->
 from(_, _) ->
   {reduce, []}.
 -spec from(any(), hydrologic:accumulator(), any()) -> {reduce, hydrologic:accumulator()}.
+from('__end__', Acc, _) ->
+  {reduce, Acc};
 from(Data, [], Data) ->
   {reduce, [Data]};
 from(_, [], _) ->
@@ -67,24 +72,28 @@ from(Data, [From|_] = Acc, From) ->
 to(Data, _) ->
   {reduce, [Data]}.
 -spec to(any(), hydrologic:accumulator(), any()) -> {reduce, hydrologic:accumulator()}.
+to('__end__', Acc, _) ->
+  {reduce, lists:reverse(Acc)};
 to(Data, Acc, To) ->
-  case erlang:hd(lists:reverse(Acc)) of
+  case erlang:hd(Acc) of
     To ->
       {reduce, Acc};
     _ ->
-      {reduce, Acc ++ [Data]}
+      {reduce, [Data|Acc]}
   end.
 
 -spec unique(any()) -> {reduce, hydrologic:accumulator()}.
 unique(Data) ->
   {reduce, [Data]}.
 -spec unique(any(), hydrologic:accumulator()) -> {reduce, hydrologic:accumulator()}.
+unique('__end__', Acc) ->
+  {reduce, lists:reverse(Acc)};
 unique(Data, Acc) ->
   case lists:member(Data, Acc) of
     true ->
       {reduce, Acc};
     false ->
-      {reduce, Acc ++ [Data]}
+      {reduce, [Data|Acc]}
   end.
 
 -spec head(any(), non_neg_integer()) -> {reduce, hydrologic:accumulator()}.
@@ -93,10 +102,12 @@ head(_, N) when N == 0 ->
 head(Data, _) ->
   {reduce, [Data]}.
 -spec head(any(), hydrologic:accumulator(), non_neg_integer()) -> {reduce, hydrologic:accumulator()}.
+head('__end__', Acc, _) ->
+  {reduce, lists:reverse(Acc)};
 head(_, _, 0) ->
   {reduce, []};
 head(Data, Acc, N) when length(Acc) < N ->
-  {reduce, Acc ++ [Data]};
+  {reduce, [Data|Acc]};
 head(_, Acc, _) ->
   {reduce, Acc}.
 
@@ -106,12 +117,25 @@ tail(_, N) when N == 0 ->
 tail(Data, _) ->
   {reduce, [Data]}.
 -spec tail(any(), hydrologic:accumulator(), non_neg_integer()) -> {reduce, hydrologic:accumulator()}.
+tail('__end__', Acc, _) ->
+  {reduce, Acc};
 tail(_, _, 0) ->
   {reduce, []};
 tail(Data, Acc, N) when length(Acc) < N ->
   {reduce, Acc ++ [Data]};
 tail(Data, [_|Acc], _) ->
   {reduce, Acc ++ [Data]}.
+
+-spec drop(any(), head|tail, non_neg_integer()) -> {reduce, hydrologic:accumulator()}.
+drop(Data, _, _) ->
+  {reduce, [Data]}.
+-spec drop(any(), hydrologic:accumulator(), head|tail, non_neg_integer()) -> {reduce, hydrologic:accumulator()}.
+drop('__end__', Acc, head, N) ->
+  {reduce, lists:nthtail(N, lists:reverse(Acc))};
+drop('__end__', Acc, tail, N) ->
+  {reduce, lists:reverse(lists:nthtail(N, Acc))};
+drop(Data, Acc, _, _) ->
+  {reduce, [Data|Acc]}.
 
 % String
 
@@ -152,6 +176,8 @@ count(Data, lines) ->
 count(Data, words) ->
   {reduce, erlang:length(string:tokens(bucs:to_string(Data), "\n\r\t "))}.
 -spec count(any(), hydrologic:accumulator(), chars | words | lines) -> {reduce, hydrologic:accumulator()}.
+count('__end__', Acc, _) ->
+  {reduce, Acc};
 count(Data, Acc, chars) ->
   {reduce, Acc + erlang:length(bucs:to_string(Data))};
 count(Data, Acc, lines) ->
@@ -173,5 +199,8 @@ odd(Data) ->
 sum(Data) ->
   {reduce, Data}.
 -spec sum(integer(), hydrologic:accumulator()) -> {reduce, hydrologic:accumulator()}.
+sum('__end__', Acc) ->
+  {reduce, Acc};
 sum(Data, Acc) ->
   {reduce, Acc + Data}.
+

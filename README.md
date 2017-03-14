@@ -97,7 +97,6 @@ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED WAR
 
 
 ### TODO ###
-* STDLIB: drop head|tail N - (map, list)
 * STDLIB: split Pattern - (map, elem->list)
 * STDLIB: join Separator - (map, list->elem)
 * STDLIB: strip left|right|both - (map, elem)

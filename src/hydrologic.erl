@@ -393,8 +393,8 @@ callfun2(Function, Args) when is_list(Args) andalso
                               is_function(Function, length(Args)) ->
   erlang:apply(Function, Args).
 
-callfun5([], _, reduce, Acc, []) ->
-  {reduce, Acc};
+callfun5([], _, reduce, Reduce, []) ->
+  Reduce;
 callfun5([], _, Type, Acc0, Acc1) ->
   {Type, lists:reverse(Acc0), lists:reverse(Acc1)};
 callfun5(['$empty$'|Rest], Function, Type, Acc0, Acc1) ->
@@ -422,8 +422,8 @@ next_call(_, Rest, Function, Type0, Acc0, Acc1, Other) when Type0 == map;
                                                             Type0 == '$' ->
   callfun5(Rest, Function, map, [Other|Acc0], Acc1).
 
-reduce([], _, {reduce, Acc}) ->
-  Acc;
+reduce([], Function, {reduce, Acc}) ->
+  callfun2(Function, ['__end__', Acc]);
 reduce([Data|Rest], Function, {reduce, Acc}) ->
   reduce(Rest, Function, callfun2(Function, [Data, Acc])).
 
