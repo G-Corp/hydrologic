@@ -12,16 +12,6 @@
 
 
 
-### <a name="type-accumulator">accumulator()</a> ###
-
-
-<pre><code>
-accumulator() = any()
-</code></pre>
-
-
-
-
 ### <a name="type-data">data()</a> ###
 
 
@@ -47,6 +37,16 @@ operation() = term()
 
 <pre><code>
 pipe() = atom()
+</code></pre>
+
+
+
+
+### <a name="type-reduct">reduct()</a> ###
+
+
+<pre><code>
+reduct() = <a href="#type-data">data()</a> | {<a href="#type-data">data()</a>, any()} | {'__end__', any()}
 </code></pre>
 
 <a name="index"></a>

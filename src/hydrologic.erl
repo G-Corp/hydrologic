@@ -9,7 +9,7 @@
         ]).
 
 -export_type([
-              accumulator/0
+              reduct/0
              ]).
 
 -define(FLOW(Data), (erlang:is_list(Data) andalso not bucs:is_string(Data)) orelse bucs:is_list_of_lists(Data)).
@@ -17,7 +17,7 @@
 -type operation() :: term().
 -type pipe() :: atom().
 -type data() :: any().
--type accumulator() :: any().
+-type reduct() :: data() | {data(), any()} | {'__end__', any()}.
 
 % @doc
 % Create a new pipe.
@@ -262,6 +262,8 @@ response(PID, EndPID, #{data := Data} = Record, Function) ->
           EndPID ! ok;
         {return, NewData} ->
           EndPID ! Record#{data => NewData};
+        {reduce, NewData} ->
+          PID ! Record#{data => NewData, flow => ?FLOW(NewData)};
         {error, Error} ->
           EndPID ! Record#{error => Error};
         Other ->
@@ -282,6 +284,8 @@ response(PID, AltPID, EndPID, #{data := Data} = Record, Function) ->
           AltPID ! Record;
         {return, NewData} ->
           EndPID ! Record#{data => NewData};
+        {reduce, NewData} ->
+          PID ! Record#{data => NewData, flow => ?FLOW(NewData)};
         {error, Error} ->
           EndPID ! Record#{error => Error};
         Other ->
@@ -423,9 +427,9 @@ next_call(_, Rest, Function, Type0, Acc0, Acc1, Other) when Type0 == map;
   callfun5(Rest, Function, map, [Other|Acc0], Acc1).
 
 reduce([], Function, {reduce, Acc}) ->
-  callfun2(Function, ['__end__', Acc]);
+  callfun2(Function, [{'__end__', Acc}]);
 reduce([Data|Rest], Function, {reduce, Acc}) ->
-  reduce(Rest, Function, callfun2(Function, [Data, Acc])).
+  reduce(Rest, Function, callfun2(Function, [{Data, Acc}])).
 
 remove_empty([]) ->
   [];

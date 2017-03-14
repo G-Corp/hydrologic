@@ -329,5 +329,35 @@ hydrologic_stdlib_test_() ->
         ?assertEqual({ok, [1, 2, 3, 4, 5, 6, 7]},
                      hydrologic:run(test, [1, [2, 3], [4, [5, [6, 7]]]])),
         hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [{duplicate, [3]}]
+         ),
+        ?assertEqual({ok, [a, a, a, b, b, b, c, c, c]},
+                     hydrologic:run(test, [a, b, c])),
+        hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [{duplicate, [3]}]
+         ),
+        ?assertEqual({ok, [a, a, a]},
+                     hydrologic:run(test, a)),
+        hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [
+           {duplicate, [3]},
+           unique
+          ]
+         ),
+        ?assertEqual({ok, [a]},
+                     hydrologic:run(test, a)),
+        hydrologic:stop(test)
     end
    ]}.

@@ -9,7 +9,7 @@
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#between-3">between/3</a></td><td></td></tr><tr><td valign="top"><a href="#chop-2">chop/2</a></td><td></td></tr><tr><td valign="top"><a href="#console-1">console/1</a></td><td></td></tr><tr><td valign="top"><a href="#console-2">console/2</a></td><td></td></tr><tr><td valign="top"><a href="#count-2">count/2</a></td><td></td></tr><tr><td valign="top"><a href="#count-3">count/3</a></td><td></td></tr><tr><td valign="top"><a href="#drop-3">drop/3</a></td><td></td></tr><tr><td valign="top"><a href="#drop-4">drop/4</a></td><td></td></tr><tr><td valign="top"><a href="#even-1">even/1</a></td><td></td></tr><tr><td valign="top"><a href="#flatten-1">flatten/1</a></td><td></td></tr><tr><td valign="top"><a href="#flatten-2">flatten/2</a></td><td></td></tr><tr><td valign="top"><a href="#from-2">from/2</a></td><td></td></tr><tr><td valign="top"><a href="#from-3">from/3</a></td><td></td></tr><tr><td valign="top"><a href="#head-2">head/2</a></td><td></td></tr><tr><td valign="top"><a href="#head-3">head/3</a></td><td></td></tr><tr><td valign="top"><a href="#match-2">match/2</a></td><td></td></tr><tr><td valign="top"><a href="#odd-1">odd/1</a></td><td></td></tr><tr><td valign="top"><a href="#pad-3">pad/3</a></td><td></td></tr><tr><td valign="top"><a href="#pad-4">pad/4</a></td><td></td></tr><tr><td valign="top"><a href="#return-1">return/1</a></td><td></td></tr><tr><td valign="top"><a href="#sort-1">sort/1</a></td><td></td></tr><tr><td valign="top"><a href="#sort-2">sort/2</a></td><td></td></tr><tr><td valign="top"><a href="#sum-1">sum/1</a></td><td></td></tr><tr><td valign="top"><a href="#sum-2">sum/2</a></td><td></td></tr><tr><td valign="top"><a href="#tail-2">tail/2</a></td><td></td></tr><tr><td valign="top"><a href="#tail-3">tail/3</a></td><td></td></tr><tr><td valign="top"><a href="#to-2">to/2</a></td><td></td></tr><tr><td valign="top"><a href="#to-3">to/3</a></td><td></td></tr><tr><td valign="top"><a href="#unique-1">unique/1</a></td><td></td></tr><tr><td valign="top"><a href="#unique-2">unique/2</a></td><td></td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#between-3">between/3</a></td><td></td></tr><tr><td valign="top"><a href="#chop-2">chop/2</a></td><td></td></tr><tr><td valign="top"><a href="#console-1">console/1</a></td><td></td></tr><tr><td valign="top"><a href="#console-2">console/2</a></td><td></td></tr><tr><td valign="top"><a href="#count-2">count/2</a></td><td></td></tr><tr><td valign="top"><a href="#drop-3">drop/3</a></td><td></td></tr><tr><td valign="top"><a href="#duplicate-2">duplicate/2</a></td><td></td></tr><tr><td valign="top"><a href="#even-1">even/1</a></td><td></td></tr><tr><td valign="top"><a href="#flatten-1">flatten/1</a></td><td></td></tr><tr><td valign="top"><a href="#from-2">from/2</a></td><td></td></tr><tr><td valign="top"><a href="#head-2">head/2</a></td><td></td></tr><tr><td valign="top"><a href="#match-2">match/2</a></td><td></td></tr><tr><td valign="top"><a href="#odd-1">odd/1</a></td><td></td></tr><tr><td valign="top"><a href="#pad-3">pad/3</a></td><td></td></tr><tr><td valign="top"><a href="#pad-4">pad/4</a></td><td></td></tr><tr><td valign="top"><a href="#return-1">return/1</a></td><td></td></tr><tr><td valign="top"><a href="#sort-1">sort/1</a></td><td></td></tr><tr><td valign="top"><a href="#sum-1">sum/1</a></td><td></td></tr><tr><td valign="top"><a href="#tail-2">tail/2</a></td><td></td></tr><tr><td valign="top"><a href="#to-2">to/2</a></td><td></td></tr><tr><td valign="top"><a href="#unique-1">unique/1</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
@@ -57,16 +57,7 @@ console(Data::any(), Format::string()) -&gt; {map, any()}
 ### count/2 ###
 
 <pre><code>
-count(Data::any(), X2::chars | words | lines) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
-</code></pre>
-<br />
-
-<a name="count-3"></a>
-
-### count/3 ###
-
-<pre><code>
-count(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>, X3::chars | words | lines) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+count(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, X2::chars | words | lines) -&gt; {reduce, non_neg_integer()}
 </code></pre>
 <br />
 
@@ -75,16 +66,16 @@ count(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accu
 ### drop/3 ###
 
 <pre><code>
-drop(Data::any(), X2::head | tail, X3::non_neg_integer()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+drop(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, X2::head | tail, N::non_neg_integer()) -&gt; {reduce, list()}
 </code></pre>
 <br />
 
-<a name="drop-4"></a>
+<a name="duplicate-2"></a>
 
-### drop/4 ###
+### duplicate/2 ###
 
 <pre><code>
-drop(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>, X3::head | tail, N::non_neg_integer()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+duplicate(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, N::non_neg_integer()) -&gt; {reduce, list()}
 </code></pre>
 <br />
 
@@ -102,16 +93,7 @@ even(Data::integer()) -&gt; {filter, boolean()}
 ### flatten/1 ###
 
 <pre><code>
-flatten(Data::any()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
-</code></pre>
-<br />
-
-<a name="flatten-2"></a>
-
-### flatten/2 ###
-
-<pre><code>
-flatten(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+flatten(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>) -&gt; {reduce, list()}
 </code></pre>
 <br />
 
@@ -120,16 +102,7 @@ flatten(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:ac
 ### from/2 ###
 
 <pre><code>
-from(Data::any(), X2::any()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
-</code></pre>
-<br />
-
-<a name="from-3"></a>
-
-### from/3 ###
-
-<pre><code>
-from(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>, From::any()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+from(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, From::any()) -&gt; {reduce, list()}
 </code></pre>
 <br />
 
@@ -138,16 +111,7 @@ from(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accum
 ### head/2 ###
 
 <pre><code>
-head(Data::any(), N::non_neg_integer()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
-</code></pre>
-<br />
-
-<a name="head-3"></a>
-
-### head/3 ###
-
-<pre><code>
-head(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>, N::non_neg_integer()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+head(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, N::non_neg_integer()) -&gt; {reduce, list()}
 </code></pre>
 <br />
 
@@ -201,16 +165,7 @@ return(Data::any()) -&gt; {return, any()}
 ### sort/1 ###
 
 <pre><code>
-sort(Data::any()) -&gt; {reduce, list()}
-</code></pre>
-<br />
-
-<a name="sort-2"></a>
-
-### sort/2 ###
-
-<pre><code>
-sort(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+sort(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>) -&gt; {reduce, list()}
 </code></pre>
 <br />
 
@@ -219,16 +174,7 @@ sort(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accum
 ### sum/1 ###
 
 <pre><code>
-sum(Data::integer()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
-</code></pre>
-<br />
-
-<a name="sum-2"></a>
-
-### sum/2 ###
-
-<pre><code>
-sum(Data::integer(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+sum(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>) -&gt; {reduce, non_neg_integer()}
 </code></pre>
 <br />
 
@@ -237,16 +183,7 @@ sum(Data::integer(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:ac
 ### tail/2 ###
 
 <pre><code>
-tail(Data::any(), N::non_neg_integer()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
-</code></pre>
-<br />
-
-<a name="tail-3"></a>
-
-### tail/3 ###
-
-<pre><code>
-tail(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>, N::non_neg_integer()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+tail(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, N::non_neg_integer()) -&gt; {reduce, list()}
 </code></pre>
 <br />
 
@@ -255,16 +192,7 @@ tail(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accum
 ### to/2 ###
 
 <pre><code>
-to(Data::any(), X2::any()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
-</code></pre>
-<br />
-
-<a name="to-3"></a>
-
-### to/3 ###
-
-<pre><code>
-to(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>, To::any()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+to(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, To::any()) -&gt; {reduce, list()}
 </code></pre>
 <br />
 
@@ -273,16 +201,7 @@ to(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumul
 ### unique/1 ###
 
 <pre><code>
-unique(Data::any()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
-</code></pre>
-<br />
-
-<a name="unique-2"></a>
-
-### unique/2 ###
-
-<pre><code>
-unique(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+unique(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>) -&gt; {reduce, list()}
 </code></pre>
 <br />
 
