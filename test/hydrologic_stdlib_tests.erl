@@ -320,5 +320,14 @@ hydrologic_stdlib_test_() ->
         ?assertEqual({ok, [1, 2, 3]},
                      hydrologic:run(test, [1, 2, 3, 4, 5, 6])),
         hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [flatten]
+         ),
+        ?assertEqual({ok, [1, 2, 3, 4, 5, 6, 7]},
+                     hydrologic:run(test, [1, [2, 3], [4, [5, [6, 7]]]])),
+        hydrologic:stop(test)
     end
    ]}.

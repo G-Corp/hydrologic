@@ -12,6 +12,7 @@
          , head/2, head/3
          , tail/2, tail/3
          , drop/3, drop/4
+         , flatten/1, flatten/2
         ]).
 
 -export([
@@ -136,6 +137,22 @@ drop('__end__', Acc, tail, N) ->
   {reduce, lists:reverse(lists:nthtail(N, Acc))};
 drop(Data, Acc, _, _) ->
   {reduce, [Data|Acc]}.
+
+-spec flatten(any()) -> {reduce, hydrologic:accumulator()}.
+flatten(Data) ->
+  {reduce, [Data]}.
+-spec flatten(any(), hydrologic:accumulator()) -> {reduce, hydrologic:accumulator()}.
+flatten('__end__', Acc) ->
+  {reduce, do_flatten(lists:reverse(Acc))};
+flatten(Data, Acc) ->
+  {reduce, [Data|Acc]}.
+
+do_flatten([]) ->
+  [];
+do_flatten([X|Rest]) when is_list(X) ->
+  do_flatten(X) ++ do_flatten(Rest);
+do_flatten([X|Rest]) ->
+  [X|do_flatten(Rest)].
 
 % String
 

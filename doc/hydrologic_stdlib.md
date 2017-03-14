@@ -9,7 +9,7 @@
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#between-3">between/3</a></td><td></td></tr><tr><td valign="top"><a href="#chop-2">chop/2</a></td><td></td></tr><tr><td valign="top"><a href="#console-1">console/1</a></td><td></td></tr><tr><td valign="top"><a href="#console-2">console/2</a></td><td></td></tr><tr><td valign="top"><a href="#count-2">count/2</a></td><td></td></tr><tr><td valign="top"><a href="#count-3">count/3</a></td><td></td></tr><tr><td valign="top"><a href="#drop-3">drop/3</a></td><td></td></tr><tr><td valign="top"><a href="#drop-4">drop/4</a></td><td></td></tr><tr><td valign="top"><a href="#even-1">even/1</a></td><td></td></tr><tr><td valign="top"><a href="#from-2">from/2</a></td><td></td></tr><tr><td valign="top"><a href="#from-3">from/3</a></td><td></td></tr><tr><td valign="top"><a href="#head-2">head/2</a></td><td></td></tr><tr><td valign="top"><a href="#head-3">head/3</a></td><td></td></tr><tr><td valign="top"><a href="#match-2">match/2</a></td><td></td></tr><tr><td valign="top"><a href="#odd-1">odd/1</a></td><td></td></tr><tr><td valign="top"><a href="#pad-3">pad/3</a></td><td></td></tr><tr><td valign="top"><a href="#pad-4">pad/4</a></td><td></td></tr><tr><td valign="top"><a href="#return-1">return/1</a></td><td></td></tr><tr><td valign="top"><a href="#sort-1">sort/1</a></td><td></td></tr><tr><td valign="top"><a href="#sort-2">sort/2</a></td><td></td></tr><tr><td valign="top"><a href="#sum-1">sum/1</a></td><td></td></tr><tr><td valign="top"><a href="#sum-2">sum/2</a></td><td></td></tr><tr><td valign="top"><a href="#tail-2">tail/2</a></td><td></td></tr><tr><td valign="top"><a href="#tail-3">tail/3</a></td><td></td></tr><tr><td valign="top"><a href="#to-2">to/2</a></td><td></td></tr><tr><td valign="top"><a href="#to-3">to/3</a></td><td></td></tr><tr><td valign="top"><a href="#unique-1">unique/1</a></td><td></td></tr><tr><td valign="top"><a href="#unique-2">unique/2</a></td><td></td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#between-3">between/3</a></td><td></td></tr><tr><td valign="top"><a href="#chop-2">chop/2</a></td><td></td></tr><tr><td valign="top"><a href="#console-1">console/1</a></td><td></td></tr><tr><td valign="top"><a href="#console-2">console/2</a></td><td></td></tr><tr><td valign="top"><a href="#count-2">count/2</a></td><td></td></tr><tr><td valign="top"><a href="#count-3">count/3</a></td><td></td></tr><tr><td valign="top"><a href="#drop-3">drop/3</a></td><td></td></tr><tr><td valign="top"><a href="#drop-4">drop/4</a></td><td></td></tr><tr><td valign="top"><a href="#even-1">even/1</a></td><td></td></tr><tr><td valign="top"><a href="#flatten-1">flatten/1</a></td><td></td></tr><tr><td valign="top"><a href="#flatten-2">flatten/2</a></td><td></td></tr><tr><td valign="top"><a href="#from-2">from/2</a></td><td></td></tr><tr><td valign="top"><a href="#from-3">from/3</a></td><td></td></tr><tr><td valign="top"><a href="#head-2">head/2</a></td><td></td></tr><tr><td valign="top"><a href="#head-3">head/3</a></td><td></td></tr><tr><td valign="top"><a href="#match-2">match/2</a></td><td></td></tr><tr><td valign="top"><a href="#odd-1">odd/1</a></td><td></td></tr><tr><td valign="top"><a href="#pad-3">pad/3</a></td><td></td></tr><tr><td valign="top"><a href="#pad-4">pad/4</a></td><td></td></tr><tr><td valign="top"><a href="#return-1">return/1</a></td><td></td></tr><tr><td valign="top"><a href="#sort-1">sort/1</a></td><td></td></tr><tr><td valign="top"><a href="#sort-2">sort/2</a></td><td></td></tr><tr><td valign="top"><a href="#sum-1">sum/1</a></td><td></td></tr><tr><td valign="top"><a href="#sum-2">sum/2</a></td><td></td></tr><tr><td valign="top"><a href="#tail-2">tail/2</a></td><td></td></tr><tr><td valign="top"><a href="#tail-3">tail/3</a></td><td></td></tr><tr><td valign="top"><a href="#to-2">to/2</a></td><td></td></tr><tr><td valign="top"><a href="#to-3">to/3</a></td><td></td></tr><tr><td valign="top"><a href="#unique-1">unique/1</a></td><td></td></tr><tr><td valign="top"><a href="#unique-2">unique/2</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
@@ -94,6 +94,24 @@ drop(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accum
 
 <pre><code>
 even(Data::integer()) -&gt; {filter, boolean()}
+</code></pre>
+<br />
+
+<a name="flatten-1"></a>
+
+### flatten/1 ###
+
+<pre><code>
+flatten(Data::any()) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
+</code></pre>
+<br />
+
+<a name="flatten-2"></a>
+
+### flatten/2 ###
+
+<pre><code>
+flatten(Data::any(), Acc::<a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>) -&gt; {reduce, <a href="hydrologic.md#type-accumulator">hydrologic:accumulator()</a>}
 </code></pre>
 <br />
 

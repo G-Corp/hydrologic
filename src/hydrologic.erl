@@ -27,7 +27,7 @@ new(Name, Operations) when is_list(Operations) ->
   create(Name, Operations, self()).
 
 % @doc
-%
+% Execute a pipe treatment.
 % @end
 -spec run(pipe(), data()) -> {ok, data()}
                              | {error, term(), data()}
