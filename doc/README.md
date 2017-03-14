@@ -53,7 +53,7 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 
 ### Examples ###
 
-![](http://yuml.me/diagram/scruffy;dir:LR/class/%2F%2F Cool Class Diagram, [a|X rem 2 == 0|b]->[b|X + 2], [a|X rem 2 == 0|b]->[X * 2], [X * 2]->[b|X + 2])
+![](https://yuml.me/diagram/scruffy;dir:LR/class/%2F%2F%20Cool%20Class%20Diagram,%20[a%7CX%20rem%202%20==%200%7Cb]-%3E[b%7CX%20+%202],%20[a%7CX%20rem%202%20==%200%7Cb]-%3E[X%20*%202],%20[X%20*%202]-%3E[b%7CX%20+%202])
 
 ```
 
