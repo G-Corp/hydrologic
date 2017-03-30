@@ -11,11 +11,20 @@ tokenize([], Line, Column, Tokens) ->
   {ok, Line, Column, lists:reverse(Tokens)};
 
 % Indent and space
+tokenize([H|Rest], Line, Column, Tokens) when ?is_cr(H) ->
+  tokenize(Rest, Line, Column, Tokens);
+tokenize([H|Rest], Line, _Column, Tokens) when ?is_lf(H) ->
+  tokenize(Rest, Line + 1, 1, Tokens);
 tokenize([H|_] = String, Line, Column, Tokens) when ?is_space(H), Column == 1 ->
   {Rest, Size} = build_ident(String, 0),
   tokenize(Rest, Line, Column + Size, [{indent, {Line, Column, Column + Size}, Size}|Tokens]);
 tokenize([H|Rest], Line, Column, Tokens) when ?is_space(H) ->
   tokenize(Rest, Line, Column + 1, Tokens);
+
+% IN
+tokenize([H|_] = String, Line, Column, Tokens) when ?is_in_out(H) ->
+  {Rest, Identifier, Size, _} = build_identifier(String, 0, []),
+  tokenize(Rest, Line, Column + Size, [{in, {Line, Column, Column + Size}, Identifier}|Tokens]);
 
 % Integer and floats
 tokenize([H|_] = String, Line, Column, Tokens) when ?is_digit(H) ->
@@ -24,24 +33,20 @@ tokenize([H|_] = String, Line, Column, Tokens) when ?is_digit(H) ->
 
 % Identifier and keywords
 tokenize([H|_] = String, Line, Column, Tokens) when ?is_identifier(H) ->
-  case build_identifier(String, 0, []) of
-    {Rest, Identifier, Size, true} ->
-      tokenize(Rest, Line, Column + Size, [{keyword, {Line, Column, Column + Size}, Identifier}|Tokens]);
-    {Rest, Identifier, Size, false} ->
-      tokenize(Rest, Line, Column + Size, [{identifier, {Line, Column, Column + Size}, Identifier}|Tokens])
-  end;
+  {Rest, Identifier, Size, Type} = build_identifier(String, 0, []),
+  tokenize(Rest, Line, Column + Size, [{Type, {Line, Column, Column + Size}, Identifier}|Tokens]);
 
 tokenize([H|_] = String, Line, Column, Tokens) when ?is_op(H) ->
   {Rest, Operator, Size} = build_operator(String, 0, []),
-  tokenize(Rest, Line, Column + Size, [{operator, {Line, Column, Column + Size}, Operator}|Tokens]);
+  tokenize(Rest, Line, Column + Size, [{operator, {Line, Column, Column + Size}, Operator}|Tokens]).
 
 % End of line
-tokenize("\n" ++ Rest, Line, Column, Tokens) ->
-  {Line1, Tokens1} = eol(Line, Column, Tokens),
-  tokenize(Rest, Line1, 1, Tokens1);
-tokenize("\r\n" ++ Rest, Line, Column, Tokens) ->
-  {Line1, Tokens1} = eol(Line, Column, Tokens),
-  tokenize(Rest, Line1, 1, Tokens1).
+% tokenize("\n" ++ Rest, Line, Column, Tokens) ->
+%   {Line1, Tokens1} = eol(Line, Column, Tokens),
+%   tokenize(Rest, Line1, 1, Tokens1);
+% tokenize("\r\n" ++ Rest, Line, Column, Tokens) ->
+%   {Line1, Tokens1} = eol(Line, Column, Tokens),
+%   tokenize(Rest, Line1, 1, Tokens1).
 
 % Private
 
@@ -59,11 +64,16 @@ build_number(Rest, Acc, float) ->
 build_number(Rest, Acc, integer) ->
   {Rest, list_to_integer(lists:reverse(Acc)), length(Acc), integer}.
 
-build_identifier([H|Rest], Len, Current) when ?is_identifier(H) ->
+build_identifier([H|Rest], Len, Current) when ?is_identifier_part(H) ->
   build_identifier(Rest, Len + 1, [H|Current]);
 build_identifier(Rest, Len, Current) ->
   Identifier = list_to_atom(lists:reverse(Current)),
-  {Rest, Identifier, Len, reserved_word(Identifier)}.
+  case Current of
+    [X|_] when ?is_in_out(X) ->
+      {Rest, Identifier, Len, out};
+    _ ->
+      {Rest, Identifier, Len, reserved_word(Identifier)}
+  end.
 
 build_operator([H|Rest], Len, Current) when ?is_op(H) ->
   build_operator(Rest, Len + 1, [H|Current]);
@@ -73,7 +83,12 @@ build_operator(Rest, Len, Current) ->
 
 % eol(_Line, _Column, [{';', _}|_] = Tokens) -> Tokens;
 % eol(_Line, _Column, [{',', _}|_] = Tokens) -> Tokens;
-eol(Line, _Column, [{eol, _}|_] = Tokens) -> {Line + 1, Tokens};
-eol(Line, Column, Tokens) -> {Line + 1, [{eol, {Line, Column, Column + 1}}|Tokens]}.
+% eol(Line, _Column, [{eol, _}|_] = Tokens) -> {Line + 1, Tokens};
+% eol(Line, Column, Tokens) -> {Line + 1, [{eol, {Line, Column, Column + 1}}|Tokens]}.
 
-reserved_word(_) -> false.
+reserved_word('duplicate') -> duplicate;
+reserved_word('merge') -> merge;
+reserved_word('fanin') -> fanin;
+reserved_word('fun') -> 'fun';
+reserved_word('end') -> 'end';
+reserved_word(_) -> identifier.

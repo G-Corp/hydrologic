@@ -99,5 +99,19 @@ hydrologic_test_() ->
         ?assertEqual({ok, [1, 4, 9, 16]},
                      hydrologic:run(test, [1, 2, 3, 4])),
         hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [
+           fun({'__end__', Acc}) -> {reduce, Acc};
+              ({Data, Acc}) -> {reduce, Acc + Data};
+              (Data) -> {reduce, Data}
+           end
+          ]
+         ),
+        ?assertEqual({ok, 10},
+                     hydrologic:run(test, [1, 2, 3, 4])),
+        hydrologic:stop(test)
     end
    ]}.

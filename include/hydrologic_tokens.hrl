@@ -3,10 +3,14 @@
 -define(is_upcase(S), (S >= $A andalso S =< $Z)).
 -define(is_downcase(S), (S >= $a andalso S =< $z)).
 -define(is_space(S), ((S == $\s) orelse (S == $\t))).
+-define(is_cr(S), S == $\r).
+-define(is_lf(S), S == $\n).
 
 -define(is_identifier(S), (?is_upcase(S) orelse ?is_downcase(S))).
+-define(is_identifier_part(S), (?is_identifier(S) orelse ?is_digit(S) orelse S == $_ orelse ?is_in_out(S))).
 
 -define(is_op(S), (not (?is_digit(S) orelse ?is_upcase(S) orelse ?is_downcase(S) orelse ?is_space(S)))).
+-define(is_in_out(T), T == $:).
 -define(dot_op(T), T == $.).
 -define(pipe_op(T), T == $|).
 -define(match_op(T), T == $=).

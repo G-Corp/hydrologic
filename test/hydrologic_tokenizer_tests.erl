@@ -59,6 +59,16 @@ hydrologic_tokenizer_tests_test_() ->
              {identifier, {1, 20, 25}, upper},
              {operator, {1, 26, 27}, "|"},
              {identifier, {1, 28, 35}, console}]},
-           hydrologic_tokenizer:tokenize("< file txt | xlate upper | console"))
+           hydrologic_tokenizer:tokenize("< file txt | xlate upper | console")),
+
+        R =
+        hydrologic_tokenizer:tokenize("| fun(X) -> 2 * X end\n" ++
+                                      "| duplicate :a\n" ++
+                                      "| fun(X) -> 3 * X end\n" ++
+                                      "| :b merge fun(X1, X2) -> X1 + X2 end\n" ++
+                                      "?\n" ++
+                                      "| :a fun(X) -> X + X end\n" ++
+                                      "| b:"),
+        ?debugFmt("-----\n~p~n-----", [R])
     end
    ]}.

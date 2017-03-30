@@ -1,6 +1,6 @@
-(end ?) 
-  < input txt 
-  | a: locate /Hello/ 
+(end ?)
+  < input txt
+  | a: locate /Hello/
   | insert / World!/ after
   | i: faninany
   | > newfile txt a

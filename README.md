@@ -108,6 +108,5 @@ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED WAR
 
 <table width="100%" border="0" summary="list of modules">
 <tr><td><a href="https://github.com/G-Corp/hydrologic/blob/master/doc/hydrologic.md" class="module">hydrologic</a></td></tr>
-<tr><td><a href="https://github.com/G-Corp/hydrologic/blob/master/doc/hydrologic_lib.md" class="module">hydrologic_lib</a></td></tr>
 <tr><td><a href="https://github.com/G-Corp/hydrologic/blob/master/doc/hydrologic_stdlib.md" class="module">hydrologic_stdlib</a></td></tr></table>
 

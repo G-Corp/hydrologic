@@ -5,3 +5,5 @@ include bu.mk
 release: dist lint tag
 	$(verbose) $(REBAR) hex publish
 
+distclean::
+	$(verbose) $(RM_RF) doc

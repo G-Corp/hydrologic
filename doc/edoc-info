@@ -1,3 +1,3 @@
 %% encoding: UTF-8
 {application,hydrologic}.
-{modules,[hydrologic,hydrologic_lib,hydrologic_stdlib]}.
+{modules,[hydrologic,hydrologic_stdlib]}.
