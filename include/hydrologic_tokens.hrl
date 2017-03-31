@@ -11,10 +11,12 @@
 
 -define(is_op(S), (not (?is_digit(S) orelse ?is_upcase(S) orelse ?is_downcase(S) orelse ?is_space(S)))).
 -define(is_in_out(T), T == $:).
--define(dot_op(T), T == $.).
--define(pipe_op(T), T == $|).
--define(match_op(T), T == $=).
--define(match_op2(T1, T2), T1 == $-, T2 == $>).
--define(mult_op(T), T == $* orelse T == $/).
--define(dual_op(T), T == $+ orelse T == $-).
+-define(is_pipe_op(T), T == $|).
+-define(is_return_op(T), T == $?).
+
+% -define(dot_op(T), T == $.).
+% -define(match_op(T), T == $=).
+% -define(match_op2(T1, T2), T1 == $-, T2 == $>).
+% -define(mult_op(T), T == $* orelse T == $/).
+% -define(dual_op(T), T == $+ orelse T == $-).
 

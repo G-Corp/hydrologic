@@ -5,40 +5,46 @@
 -export([tokenize/1]).
 
 tokenize(String) ->
-  tokenize(String, 1, 1, []).
+  tokenize(String, 1, 1, [], true).
 
-tokenize([], Line, Column, Tokens) ->
+tokenize([], Line, Column, Tokens, _NL) ->
   {ok, Line, Column, lists:reverse(Tokens)};
 
 % Indent and space
-tokenize([H|Rest], Line, Column, Tokens) when ?is_cr(H) ->
-  tokenize(Rest, Line, Column, Tokens);
-tokenize([H|Rest], Line, _Column, Tokens) when ?is_lf(H) ->
-  tokenize(Rest, Line + 1, 1, Tokens);
-tokenize([H|_] = String, Line, Column, Tokens) when ?is_space(H), Column == 1 ->
-  {Rest, Size} = build_ident(String, 0),
-  tokenize(Rest, Line, Column + Size, [{indent, {Line, Column, Column + Size}, Size}|Tokens]);
-tokenize([H|Rest], Line, Column, Tokens) when ?is_space(H) ->
-  tokenize(Rest, Line, Column + 1, Tokens);
+tokenize([H|Rest], Line, Column, Tokens, NL) when ?is_cr(H) ->
+  tokenize(Rest, Line, Column + 1, Tokens, NL);
+tokenize([H|Rest], Line, _Column, Tokens, _NL) when ?is_lf(H) ->
+  tokenize(Rest, Line + 1, 1, Tokens, true);
+% tokenize([H|_] = String, Line, Column, Tokens, NL) when ?is_space(H), NL ->
+%   {Rest, Size} = build_ident(String, 0),
+%   tokenize(Rest, Line, Column + Size, Tokens, NL);
+tokenize([H|Rest], Line, Column, Tokens, NL) when ?is_space(H) ->
+  tokenize(Rest, Line, Column + 1, Tokens, NL);
+
+% Pipe and return
+% tokenize([H|Rest], Line, Column, Tokens, true) when ?is_pipe_op(H) ->
+%   tokenize(Rest, Line, Column + 1, [{pipe, {Line, Column, Column + 1}}|Tokens], false);
+% tokenize([H|Rest], Line, Column, Tokens, true) when ?is_return_op(H) ->
+%   tokenize(Rest, Line, Column + 1, [{return, {Line, Column, Column + 1}}|Tokens], false);
 
 % IN
-tokenize([H|_] = String, Line, Column, Tokens) when ?is_in_out(H) ->
+tokenize([H|_] = String, Line, Column, Tokens, _NL) when ?is_in_out(H) ->
   {Rest, Identifier, Size, _} = build_identifier(String, 0, []),
-  tokenize(Rest, Line, Column + Size, [{in, {Line, Column, Column + Size}, Identifier}|Tokens]);
+  tokenize(Rest, Line, Column + Size, [{in, {Line, Column, Column + Size}, Identifier}|Tokens], false);
 
 % Integer and floats
-tokenize([H|_] = String, Line, Column, Tokens) when ?is_digit(H) ->
+tokenize([H|_] = String, Line, Column, Tokens, _NL) when ?is_digit(H) ->
   {Rest, Number, Size, Type} = build_number(String, [], integer),
-  tokenize(Rest, Line, Column + Size, [{Type, {Line, Column, Column + Size}, Number}|Tokens]);
+  tokenize(Rest, Line, Column + Size, [{Type, {Line, Column, Column + Size}, Number}|Tokens], false);
 
 % Identifier and keywords
-tokenize([H|_] = String, Line, Column, Tokens) when ?is_identifier(H) ->
+tokenize([H|_] = String, Line, Column, Tokens, _NL) when ?is_identifier(H) ->
   {Rest, Identifier, Size, Type} = build_identifier(String, 0, []),
-  tokenize(Rest, Line, Column + Size, [{Type, {Line, Column, Column + Size}, Identifier}|Tokens]);
+  tokenize(Rest, Line, Column + Size, [{Type, {Line, Column, Column + Size}, Identifier}|Tokens], false);
 
-tokenize([H|_] = String, Line, Column, Tokens) when ?is_op(H) ->
+tokenize([H|_] = String, Line, Column, Tokens, _NL) when ?is_op(H) ->
   {Rest, Operator, Size} = build_operator(String, 0, []),
-  tokenize(Rest, Line, Column + Size, [{operator, {Line, Column, Column + Size}, Operator}|Tokens]).
+  tokenize(Rest, Line, Column + Size, [{operator, {Line, Column, Column + Size}, Operator}|Tokens], false).
 
 % End of line
 % tokenize("\n" ++ Rest, Line, Column, Tokens) ->
@@ -50,10 +56,10 @@ tokenize([H|_] = String, Line, Column, Tokens) when ?is_op(H) ->
 
 % Private
 
-build_ident([N|R], Size) when ?is_space(N) ->
-  build_ident(R, Size + 1);
-build_ident(Rest, Size) ->
-  {Rest, Size}.
+% build_ident([N|R], Size) when ?is_space(N) ->
+%   build_ident(R, Size + 1);
+% build_ident(Rest, Size) ->
+%   {Rest, Size}.
 
 build_number([$., N|R], Acc, integer) when ?is_digit(N) ->
   build_number([N|R], [$.|Acc], float);

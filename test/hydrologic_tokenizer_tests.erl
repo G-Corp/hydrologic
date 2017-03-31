@@ -18,13 +18,11 @@ hydrologic_tokenizer_tests_test_() ->
            {ok, 1, 7, [{float, {1, 1, 7}, 123.45}]},
            hydrologic_tokenizer:tokenize("123.45")),
         ?assertMatch(
-           {ok, 1, 10, [{indent, {1, 1, 3}, 2},
-                        {integer, {1, 3, 6}, 123},
+           {ok, 1, 10, [{integer, {1, 3, 6}, 123},
                         {integer, {1, 7, 10}, 456}]},
            hydrologic_tokenizer:tokenize("  123 456")),
         ?assertMatch(
-           {ok, 1, 13, [{indent, {1, 1, 3}, 2},
-                        {float, {1, 3, 9}, 123.45},
+           {ok, 1, 13, [{float, {1, 3, 9}, 123.45},
                         {integer, {1, 10, 13}, 678}]},
            hydrologic_tokenizer:tokenize("  123.45 678"))
     end,
@@ -33,17 +31,14 @@ hydrologic_tokenizer_tests_test_() ->
            {ok, 1, 5, [{identifier, {1, 1, 5}, toto}]},
            hydrologic_tokenizer:tokenize("toto")),
         ?assertMatch(
-           {ok, 1, 7, [{indent, {1, 1, 3}, 2},
-                       {identifier, {1, 3, 7}, toto}]},
+           {ok, 1, 7, [{identifier, {1, 3, 7}, toto}]},
            hydrologic_tokenizer:tokenize("  toto")),
         ?assertMatch(
-           {ok, 1, 11, [{indent, {1, 1, 3}, 2},
-                        {identifier, {1, 3, 7}, toto},
+           {ok, 1, 11, [{identifier, {1, 3, 7}, toto},
                         {integer, {1, 8, 11}, 123}]},
            hydrologic_tokenizer:tokenize("  toto 123")),
         ?assertMatch(
-           {ok, 1, 18, [{indent, {1, 1, 3}, 2},
-                        {identifier, {1, 3, 8}, match},
+           {ok, 1, 18, [{identifier, {1, 3, 8}, match},
                         {identifier, {1, 9, 13}, toto},
                         {identifier, {1, 14, 18}, with}]},
            hydrologic_tokenizer:tokenize("  match toto with"))

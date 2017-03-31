@@ -108,5 +108,6 @@ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED WAR
 
 <table width="100%" border="0" summary="list of modules">
 <tr><td><a href="hydrologic.md" class="module">hydrologic</a></td></tr>
+<tr><td><a href="hydrologic_compiler.md" class="module">hydrologic_compiler</a></td></tr>
 <tr><td><a href="hydrologic_stdlib.md" class="module">hydrologic_stdlib</a></td></tr></table>
 
