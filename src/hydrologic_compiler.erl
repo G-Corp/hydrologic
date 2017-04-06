@@ -1,5 +1,6 @@
 -module(hydrologic_compiler).
 -include("../include/hydrologic_utils.hrl").
+-include_lib("syntax_tools/include/merl.hrl").
 
 % options :
 %
@@ -13,12 +14,12 @@ compile(Name, #{compile_options := CompileOptions} = Options) ->
   Mod = erl_syntax:atom(bucs:to_atom(Name)),
 
   Module = [module(Mod)
-   , export([{run, 1}, {flow, 1}, {stop, 0}])
-   , exec_functions(run, Mod)
-   , exec_functions(flow, Mod)
-   , stop_function(Mod)
-   % TODO: , new_function()
-  ],
+            , export([{run, 1}, {flow, 1}, {stop, 0}])
+            , exec_functions(run, bucs:to_atom(Name))
+            , exec_functions(flow, bucs:to_atom(Name))
+            , stop_function(bucs:to_atom(Name))
+            % TODO: , new_function()
+           ],
   Formatted = erl_prettypr:format(erl_syntax:form_list(Module)),
   io:format("-----~n~s~n-----~n", [Formatted]),
 
@@ -95,22 +96,14 @@ export(Functions) ->
   erl_syntax:revert(Export).
 
 exec_functions(Name, Mod) ->
-  % run(Data) -> hydrologic:Name(Mod, Data).
-  Var = erl_syntax:variable("Data"),
-  Body = erl_syntax:application(
-           erl_syntax:atom(hydrologic),
-           erl_syntax:atom(Name),
-           [Mod, Var]),
-  Clause =  erl_syntax:clause([Var], [], [Body]),
-  Function =  erl_syntax:function(erl_syntax:atom(Name), [Clause]),
+  Function =  erl_syntax:function(
+                erl_syntax:atom(Name),
+                [?Q("(Data) -> hydrologic:_@Name@(_@Mod@, Data)")]),
   erl_syntax:revert(Function).
 
 stop_function(Mod) ->
-  Body = erl_syntax:application(
-           erl_syntax:atom(hydrologic),
-           erl_syntax:atom(stop),
-           [Mod]),
-  Clause =  erl_syntax:clause([], [], [Body]),
-  Function =  erl_syntax:function(erl_syntax:atom(stop), [Clause]),
+  Function = erl_syntax:function(
+               erl_syntax:atom(stop),
+               [?Q("() -> hydrologic:stop(_@Mod@)")]),
   erl_syntax:revert(Function).
 

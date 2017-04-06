@@ -9,7 +9,7 @@
 -define(is_identifier(S), (?is_upcase(S) orelse ?is_downcase(S))).
 -define(is_identifier_part(S), (?is_identifier(S) orelse ?is_digit(S) orelse S == $_ orelse ?is_in_out(S))).
 
--define(is_op(S), (not (?is_digit(S) orelse ?is_upcase(S) orelse ?is_downcase(S) orelse ?is_space(S)))).
+-define(is_op(S), (not (?is_digit(S) orelse ?is_upcase(S) orelse ?is_downcase(S) orelse ?is_space(S) orelse ?is_cr(S) orelse ?is_lf(S)))).
 -define(is_in_out(T), T == $:).
 -define(is_pipe_op(T), T == $|).
 -define(is_return_op(T), T == $?).

@@ -15,9 +15,6 @@ tokenize([H|Rest], Line, Column, Tokens, NL) when ?is_cr(H) ->
   tokenize(Rest, Line, Column + 1, Tokens, NL);
 tokenize([H|Rest], Line, _Column, Tokens, _NL) when ?is_lf(H) ->
   tokenize(Rest, Line + 1, 1, Tokens, true);
-% tokenize([H|_] = String, Line, Column, Tokens, NL) when ?is_space(H), NL ->
-%   {Rest, Size} = build_ident(String, 0),
-%   tokenize(Rest, Line, Column + Size, Tokens, NL);
 tokenize([H|Rest], Line, Column, Tokens, NL) when ?is_space(H) ->
   tokenize(Rest, Line, Column + 1, Tokens, NL);
 
@@ -43,23 +40,16 @@ tokenize([H|_] = String, Line, Column, Tokens, _NL) when ?is_identifier(H) ->
   tokenize(Rest, Line, Column + Size, [{Type, {Line, Column, Column + Size}, Identifier}|Tokens], false);
 
 tokenize([H|_] = String, Line, Column, Tokens, _NL) when ?is_op(H) ->
-  {Rest, Operator, Size} = build_operator(String, 0, []),
-  tokenize(Rest, Line, Column + Size, [{operator, {Line, Column, Column + Size}, Operator}|Tokens], false).
-
-% End of line
-% tokenize("\n" ++ Rest, Line, Column, Tokens) ->
-%   {Line1, Tokens1} = eol(Line, Column, Tokens),
-%   tokenize(Rest, Line1, 1, Tokens1);
-% tokenize("\r\n" ++ Rest, Line, Column, Tokens) ->
-%   {Line1, Tokens1} = eol(Line, Column, Tokens),
-%   tokenize(Rest, Line1, 1, Tokens1).
+  case build_operator(String, 0, []) of
+    {Rest, "|", Size} ->
+      tokenize(Rest, Line, Column + Size, [{pipe, {Line, Column, Column + Size}, "|"}|Tokens], false);
+    {Rest, "?", Size} ->
+      tokenize(Rest, Line, Column + Size, [{return, {Line, Column, Column + Size}, "?"}|Tokens], false);
+    {Rest, Operator, Size} ->
+      tokenize(Rest, Line, Column + Size, [{operator, {Line, Column, Column + Size}, Operator}|Tokens], false)
+  end.
 
 % Private
-
-% build_ident([N|R], Size) when ?is_space(N) ->
-%   build_ident(R, Size + 1);
-% build_ident(Rest, Size) ->
-%   {Rest, Size}.
 
 build_number([$., N|R], Acc, integer) when ?is_digit(N) ->
   build_number([N|R], [$.|Acc], float);
@@ -86,11 +76,7 @@ build_operator([H|Rest], Len, Current) when ?is_op(H) ->
 build_operator(Rest, Len, Current) ->
   {Rest, lists:reverse(Current), Len}.
 
-
-% eol(_Line, _Column, [{';', _}|_] = Tokens) -> Tokens;
-% eol(_Line, _Column, [{',', _}|_] = Tokens) -> Tokens;
-% eol(Line, _Column, [{eol, _}|_] = Tokens) -> {Line + 1, Tokens};
-% eol(Line, Column, Tokens) -> {Line + 1, [{eol, {Line, Column, Column + 1}}|Tokens]}.
+% Reserved
 
 reserved_word('duplicate') -> duplicate;
 reserved_word('merge') -> merge;
