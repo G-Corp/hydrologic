@@ -19,7 +19,7 @@ original records to the next output stream, and the copy to a second stream.
 <i>hydro: </i><tt>duplicate &lt;Label&gt;:</tt><br />
 <i>erlang: </i><tt>{duplicate Label :: atom()}</tt>
 
-<b>Availability: </b><i>record</i>, <i>list</i>
+<b>Availability:</b> <i>record</i>, <i>list</i>
 
 <pre>
                                      +------------+
@@ -78,7 +78,7 @@ hydrologic:new(
 <i>hydro: </i><tt>:&lt;Label&gt; merge &lt;Function&gt;</tt><br />
 <i>erlang: </i><tt>{Label :: atom(), {merge, Function :: function(2)}}</tt>
 
-<b>Availability: </b><i>record</i>, <i>list</i>
+<b>Availability:</b> <i>record</i>, <i>list</i>
 
 <pre>
 +------------+
@@ -137,7 +137,7 @@ hydrologic:new(
 <i>hydro: </i><tt>:&lt;Label&gt; fanin [0|1]</tt><br />
 <i>erlang: </i><tt>{Label :: atom(), fanin} | {Label :: atom(), {fanin, 0 | 1}}</tt>
 
-<b>Availability: </b><i>list</i>
+<b>Availability:</b> <i>list</i>
 
 <pre>
 +------------+

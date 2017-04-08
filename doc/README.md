@@ -27,7 +27,7 @@ __Syntax:__<br />
 _hydro:_`duplicate <Label>:`<br />
 _erlang:_`{duplicate Label :: atom()}`
 
-__Availability:___record_, _list_
+__Availability:__ _record_, _list_
 
 ```
 
@@ -94,7 +94,7 @@ __Syntax:__<br />
 _hydro:_`:<Label> merge <Function>`<br />
 _erlang:_`{Label :: atom(), {merge, Function :: function(2)}}`
 
-__Availability:___record_, _list_
+__Availability:__ _record_, _list_
 
 ```
 
@@ -161,7 +161,7 @@ __Syntax :__<br />
 _hydro:_`:<Label> fanin [0|1]`<br />
 _erlang:_`{Label :: atom(), fanin} | {Label :: atom(), {fanin, 0 | 1}}`
 
-__Availability:___list_
+__Availability:__ _list_
 
 ```
 
