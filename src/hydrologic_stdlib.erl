@@ -52,6 +52,8 @@ sort({'__end__', Acc}) ->
   {reduce, lists:sort(Acc)};
 sort({Data, Acc}) ->
   {reduce, [Data|Acc]};
+sort('__empty__') ->
+  {reduce, []};
 sort(Data) ->
   {reduce, [Data]}.
 
@@ -64,6 +66,8 @@ from({_, []}, _) ->
   {reduce, []};
 from({Data, [From|_] = Acc}, From) ->
   {reduce, Acc ++ [Data]};
+from('__empty__', _) ->
+  {reduce, []};
 from(Data, Data) ->
   {reduce, [Data]};
 from(_, _) ->
@@ -79,6 +83,8 @@ to({Data, Acc}, To) ->
     _ ->
       {reduce, [Data|Acc]}
   end;
+to('__empty__', _) ->
+  {reduce, []};
 to(Data, _) ->
   {reduce, [Data]}.
 
@@ -92,6 +98,8 @@ unique({Data, Acc}) ->
     false ->
       {reduce, [Data|Acc]}
   end;
+unique('__empty__') ->
+  {reduce, []};
 unique(Data) ->
   {reduce, [Data]}.
 
@@ -105,6 +113,8 @@ head({Data, Acc}, N) when length(Acc) < N ->
 head({_, Acc}, _) ->
   {reduce, Acc};
 head(_, N) when N == 0 ->
+  {reduce, []};
+head('__empty__', _) ->
   {reduce, []};
 head(Data, _) ->
   {reduce, [Data]}.
@@ -120,6 +130,8 @@ tail({Data, [_|Acc]}, _) ->
   {reduce, Acc ++ [Data]};
 tail(_, N) when N == 0 ->
   {reduce, []};
+tail('__empty__', _) ->
+  {reduce, []};
 tail(Data, _) ->
   {reduce, [Data]}.
 
@@ -130,6 +142,8 @@ drop({'__end__', Acc}, tail, N) ->
   {reduce, lists:reverse(nthtail(N, Acc))};
 drop({Data, Acc}, _, _) ->
   {reduce, [Data|Acc]};
+drop('__empty__', _, _) ->
+  {reduce, []};
 drop(Data, _, _) ->
   {reduce, [Data]}.
 
@@ -144,6 +158,8 @@ flatten({'__end__', Acc}) ->
   {reduce, do_flatten(lists:reverse(Acc))};
 flatten({Data, Acc}) ->
   {reduce, [Data|Acc]};
+flatten('__empty__') ->
+  {reduce, []};
 flatten(Data) ->
   {reduce, [Data]}.
 
@@ -159,6 +175,8 @@ repeat({'__end__', Acc}, _) ->
   {reduce, Acc};
 repeat({Data, Acc}, N) ->
   {reduce, Acc ++ lists:duplicate(N, Data)};
+repeat('__empty__', _) ->
+  {reduce, []};
 repeat(Data, N) ->
   {reduce, lists:duplicate(N, Data)}.
 
@@ -202,6 +220,8 @@ count({Data, Acc}, lines) ->
   {reduce, Acc + erlang:length(string:tokens(bucs:to_string(Data), "\n"))};
 count({Data, Acc}, words) ->
   {reduce, Acc + erlang:length(string:tokens(bucs:to_string(Data), "\n\r\t "))};
+count('__empty__', _) ->
+  {reduce, 0};
 count(Data, chars) ->
   {reduce, erlang:length(bucs:to_string(Data))};
 count(Data, lines) ->
@@ -213,6 +233,8 @@ join({'__end__', Acc}, _) ->
   {reduce, Acc};
 join({Data, Acc}, Item) ->
   {reduce, Acc ++ bucs:to_string(Item) ++ bucs:to_string(Data)};
+join('__empty__', _) ->
+  {reduce, ""};
 join(Data, _) ->
   {reduce, bucs:to_string(Data)}.
 
@@ -234,6 +256,8 @@ sum({'__end__', Acc}) ->
   {reduce, Acc};
 sum({Data, Acc}) ->
   {reduce, Acc + Data};
+sum('__empty__') ->
+  {reduce, 0};
 sum(Data) ->
   {reduce, Data}.
 

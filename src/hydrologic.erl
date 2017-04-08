@@ -308,7 +308,7 @@ flow_response(PID, EndPID, #{data := Data} = Record, Function) ->
         {error, Error} ->
           EndPID ! Record#{error => Error};
         {'$', _, _} ->
-          PID ! Record;
+          empty_response(PID, EndPID, Record, Function);
         {_, Data} ->
           PID ! Record
       end;
@@ -331,12 +331,26 @@ flow_response(PID, AltPID, EndPID, #{data := Data} = Record, Function) ->
         {error, Error} ->
           EndPID ! Record#{error => Error};
         {'$', _, _} ->
-          PID ! Record;
+          empty_response(PID, EndPID, Record, Function);
         {_, Data} ->
           PID ! Record
       end;
     false ->
       EndPID ! Record#{error => invalid_pipe}
+  end.
+empty_response(PID, EndPID, Record, Function) ->
+  try
+    case callfun2(Function, ['__empty__']) of
+      {reduce, NewData} ->
+        PID ! Record#{data => NewData, flow => ?FLOW(NewData)};
+      {error, Error} ->
+        EndPID ! Record#{error => Error};
+      _ ->
+        PID ! Record
+    end
+  catch
+    _:_ ->
+      PID ! Record
   end.
 
 gosub(Receiver, PID) ->

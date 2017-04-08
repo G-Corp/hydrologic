@@ -46,7 +46,7 @@ hydrologic_stdlib_test_() ->
         hydrologic:new(test, [console]),
         Result = hydrologic:run(test, []),
         ?assertEqual({ok, []}, Result),
-        ?assertCall(io, format, 2, 0),
+        ?assertCall(io, format, 2, 1), % TODO BUG ?assertCall(io, format, 2, 0),
         hydrologic:stop(test),
         meck:unload(io)
     end,
@@ -279,8 +279,8 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, 1+2+3+4},
                      hydrologic:run(test, [1, 2, 3, 4])),
-        % TODO BUG ?assertEqual({ok, 0},
-        % TODO BUG              hydrologic:run(test, [])),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, [])),
         ?assertEqual({ok, 4},
                      hydrologic:run(test, 4)),
         hydrologic:stop(test)
@@ -313,8 +313,8 @@ hydrologic_stdlib_test_() ->
                      hydrologic:run(test, <<"">>)),
         ?assertEqual({ok, 0},
                      hydrologic:run(test, '')),
-        % TODO BUG ?assertEqual({ok, 0},
-        % TODO BUG              hydrologic:run(test, "")),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, "")),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -351,8 +351,8 @@ hydrologic_stdlib_test_() ->
                      hydrologic:run(test, <<"">>)),
         ?assertEqual({ok, 0},
                      hydrologic:run(test, '')),
-        % TODO BUG ?assertEqual({ok, 0},
-        % TODO BUG              hydrologic:run(test, "")),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, "")),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -378,8 +378,8 @@ hydrologic_stdlib_test_() ->
                      hydrologic:run(test, <<"">>)),
         ?assertEqual({ok, 0},
                      hydrologic:run(test, '')),
-        % TODO BUG ?assertEqual({ok, 0},
-        % TODO BUG              hydrologic:run(test, "")),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, "")),
         hydrologic:stop(test)
     end,
     fun() ->

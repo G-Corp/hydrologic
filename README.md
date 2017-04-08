@@ -51,7 +51,7 @@ hydro:
 
 ```
 
-% sample.htdro
+% sample.hydro
 
 | fun(X) -> 2 * X end
 | duplicate a:
@@ -118,7 +118,7 @@ hydro:
 
 ```
 
-% sample.htdro
+% sample.hydro
 
 | fun(X) -> 2 * X end
 | duplicate a:
@@ -185,6 +185,8 @@ hydro:
 
 ```
 
+% sample.hydro
+
 | odd a:
 | :b fanin
 ?
@@ -197,7 +199,7 @@ erlang:
 ```
 
 hydrologic:new(
-  test,
+  sample,
   [
    {odd, a},
    {b, fanin},

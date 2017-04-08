@@ -105,12 +105,15 @@ hydrologic_test_() ->
           [
            fun({'__end__', Acc}) -> {reduce, lists:reverse(Acc)};
               ({Data, Acc}) -> {reduce, [Data * Data | Acc]};
+              ('__empty__') -> {reduce, []};
               (Data) -> {reduce, [Data]}
            end
           ]
          ),
         ?assertEqual({ok, [1, 4, 9, 16]},
                      hydrologic:run(test, [1, 2, 3, 4])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
         hydrologic:stop(test)
     end,
     fun() ->
