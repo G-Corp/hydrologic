@@ -11,14 +11,15 @@
 -export([compile/2]).
 
 compile(Name, #{compile_options := CompileOptions} = Options) ->
-  Mod = erl_syntax:atom(bucs:to_atom(Name)),
+  AName = bucs:to_atom(Name),
+  Data = "[fun(X) -> 2*X end, {duplicate, a}, fun(X) -> 3*X end, {b, {merge, fun(X1, X2) -> X1 + X2 end}}, return, {a, fun(X) -> X + X end}, b]",
 
-  Module = [module(Mod)
-            , export([{run, 1}, {flow, 1}, {stop, 0}])
-            , exec_functions(run, bucs:to_atom(Name))
-            , exec_functions(flow, bucs:to_atom(Name))
-            , stop_function(bucs:to_atom(Name))
-            % TODO: , new_function()
+  Module = [module(AName)
+            , export([{run, 1}, {flow, 1}, {stop, 0}, {new, 0}])
+            , exec_functions(run, AName)
+            , exec_functions(flow, AName)
+            , stop_function(AName)
+            , new_function(AName, Data)
            ],
   Formatted = erl_prettypr:format(erl_syntax:form_list(Module)),
   io:format("-----~n~s~n-----~n", [Formatted]),
@@ -80,10 +81,10 @@ load_beam(Name, _, Options) ->
   ?WARNING({Name, missing_no_load}, Options),
   Options.
 
-module(Mod) ->
+module(Name) ->
   Module = erl_syntax:attribute(
              erl_syntax:atom(module),
-             [Mod]),
+             [erl_syntax:atom(Name)]),
   erl_syntax:revert(Module).
 
 export(Functions) ->
@@ -105,5 +106,11 @@ stop_function(Mod) ->
   Function = erl_syntax:function(
                erl_syntax:atom(stop),
                [?Q("() -> hydrologic:stop(_@Mod@)")]),
+  erl_syntax:revert(Function).
+
+new_function(Mod, Data) ->
+  Function = erl_syntax:function(
+               erl_syntax:atom(new),
+               [?Q("() -> hydrologic:new(" ++ bucs:to_string(Mod) ++ ", " ++ Data ++ ")")]),
   erl_syntax:revert(Function).
 

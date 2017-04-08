@@ -90,6 +90,19 @@ hydrologic_test_() ->
         hydrologic:new(
           test,
           [
+           fun(X) ->
+               {map, X * X}
+           end
+          ]
+         ),
+        ?assertEqual({ok, 4}, hydrologic:run(test, 2)),
+        ?assertEqual({ok, [1, 4, 9]}, hydrologic:run(test, [1, 2, 3])),
+        hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [
            fun({'__end__', Acc}) -> {reduce, lists:reverse(Acc)};
               ({Data, Acc}) -> {reduce, [Data * Data | Acc]};
               (Data) -> {reduce, [Data]}

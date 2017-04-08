@@ -12,7 +12,7 @@
          , tail/2
          , drop/3
          , flatten/1
-         , duplicate/2
+         , repeat/2
         ]).
 
 -export([
@@ -22,6 +22,8 @@
          , chop/2
          , between/3
          , count/2
+         , join/2
+         , split/2
         ]).
 
 -export([
@@ -123,13 +125,19 @@ tail(Data, _) ->
 
 -spec drop(hydrologic:reduct(), head|tail, non_neg_integer()) -> {reduce, list()}.
 drop({'__end__', Acc}, head, N) ->
-  {reduce, lists:nthtail(N, lists:reverse(Acc))};
+  {reduce, nthtail(N, lists:reverse(Acc))};
 drop({'__end__', Acc}, tail, N) ->
-  {reduce, lists:reverse(lists:nthtail(N, Acc))};
+  {reduce, lists:reverse(nthtail(N, Acc))};
 drop({Data, Acc}, _, _) ->
   {reduce, [Data|Acc]};
 drop(Data, _, _) ->
   {reduce, [Data]}.
+
+nthtail(_, []) -> [];
+nthtail(1, [_|T]) -> T;
+nthtail(N, [_|T]) when N > 1 ->
+      nthtail(N - 1, T);
+nthtail(0, L) when is_list(L) -> L.
 
 -spec flatten(hydrologic:reduct()) -> {reduce, list()}.
 flatten({'__end__', Acc}) ->
@@ -146,12 +154,12 @@ do_flatten([X|Rest]) when is_list(X) ->
 do_flatten([X|Rest]) ->
   [X|do_flatten(Rest)].
 
--spec duplicate(hydrologic:reduct(), non_neg_integer()) -> {reduce, list()}.
-duplicate({'__end__', Acc}, _) ->
+-spec repeat(hydrologic:reduct(), non_neg_integer()) -> {reduce, list()}.
+repeat({'__end__', Acc}, _) ->
   {reduce, Acc};
-duplicate({Data, Acc}, N) ->
+repeat({Data, Acc}, N) ->
   {reduce, Acc ++ lists:duplicate(N, Data)};
-duplicate(Data, N) ->
+repeat(Data, N) ->
   {reduce, lists:duplicate(N, Data)}.
 
 % String
@@ -200,6 +208,16 @@ count(Data, lines) ->
   {reduce, erlang:length(string:tokens(bucs:to_string(Data), "\n"))};
 count(Data, words) ->
   {reduce, erlang:length(string:tokens(bucs:to_string(Data), "\n\r\t "))}.
+
+join({'__end__', Acc}, _) ->
+  {reduce, Acc};
+join({Data, Acc}, Item) ->
+  {reduce, Acc ++ bucs:to_string(Item) ++ bucs:to_string(Data)};
+join(Data, _) ->
+  {reduce, bucs:to_string(Data)}.
+
+split(Data, Tokens) ->
+  {map, string:tokens(Data, Tokens)}.
 
 % Integer
 

@@ -4,13 +4,181 @@
 @title Hydrologic - A pipeline system
 @doc
 
-<h3>CORE</h3>
+<a name="streams"></a><h3>Streams</h3>
 
-<tt>duplicate</tt>
+TODO
 
-<tt>{merge, Function :: function()} | {merge, Module :: atom(), Function :: atom()</tt>
+<h3>CORE stages</h3>
 
-<tt>fanin | {fanin, 0} | {fanin, 1}</tt>
+<h4>duplicate</h4>
+
+<tt>duplicate</tt> create a copy of the records from the input stream, send the
+original records to the next output stream, and the copy to a second stream.
+
+<b>Syntax: </b><br />
+<i>hydro: </i><tt>duplicate &lt;Label&gt;:</tt><br />
+<i>erlang: </i><tt>{duplicate Label :: atom()}</tt>
+
+<b>Availability: </b><i>record</i>, <i>list</i>
+
+<pre>
+                                     +------------+
+                                     |            |
+                                 +-->| :L [stage] |
++---------+    +--------------+  |   |            |
+|         |    |              |--+   +------------+
+| [stage] |--->| duplicate L: |
+|         |    |              |--+   +------------+
++---------+    +--------------+  |   |            |
+                                 +-->|  [stage]   |
+                                     |            |
+                                     +------------+
+</pre>
+
+Example :
+
+hydro:
+<pre>
+% sample.htdro
+
+| fun(X) -> 2 * X end
+| duplicate a:
+| fun(X) -> 3 * X end
+| :n merge fun(X1, X2) -> X1 + X2 end
+?
+| :a fun(X) -> X + X end
+| b:
+</pre>
+
+erlang :
+<pre>
+hydrologic:new(
+  sample,
+  [
+   fun(X) -> 2*X end, % 2 4 6
+   {duplicate, a},
+   fun(X) -> 3*X end, % 6 12 18
+   {b, {merge, fun(X1, X2) ->
+                   X1 + X2 % 10 20 30
+               end}},
+   return,
+   {a, fun(X) -> % 4 8 12
+           X + X
+       end},
+   b
+  ]
+ )
+</pre>
+
+<h4>merge</h4>
+
+<tt>merge</tt> send all records from the input streams to a function that will return a combined record and send it to the output stream.
+
+<b>Syntax:</b><br />
+<i>hydro: </i><tt>:&lt;Label&gt; merge &lt;Function&gt;</tt><br />
+<i>erlang: </i><tt>{Label :: atom(), {merge, Function :: function(2)}}</tt>
+
+<b>Availability: </b><i>record</i>, <i>list</i>
+
+<pre>
++------------+
+|            |
+| [stage] L: |--+
+|            |  |   +-------------------+    +---------+
++------------+  +-->|                   |    |         |
+                    | :L merge Function |--->| [stage] |
++------------+  +-->|                   |    |         |
+|            |  |   +-------------------+    +---------+
+|  [stage]   |--+
+|            |
++------------+
+</pre>
+
+Example :
+
+hydro:
+<pre>
+% sample.htdro
+
+| fun(X) -> 2 * X end
+| duplicate a:
+| fun(X) -> 3 * X end
+| :n merge fun(X1, X2) -> X1 + X2 end
+?
+| :a fun(X) -> X + X end
+| b:
+</pre>
+
+erlang :
+<pre>
+hydrologic:new(
+  sample,
+  [
+   fun(X) -> 2*X end, % 2 4 6
+   {duplicate, a},
+   fun(X) -> 3*X end, % 6 12 18
+   {b, {merge, fun(X1, X2) ->
+                   X1 + X2 % 10 20 30
+               end}},
+   return,
+   {a, fun(X) -> % 4 8 12
+           X + X
+       end},
+   b
+  ]
+ )
+</pre>
+
+<h4>fanin</h4>
+
+<tt>fanin</tt> reassemble the input streams.
+
+<b>Syntax :</b><br />
+<i>hydro: </i><tt>:&lt;Label&gt; fanin [0|1]</tt><br />
+<i>erlang: </i><tt>{Label :: atom(), fanin} | {Label :: atom(), {fanin, 0 | 1}}</tt>
+
+<b>Availability: </b><i>list</i>
+
+<pre>
++------------+
+|            |
+| [stage] L: |--+
+|            |  |   +------------------+    +---------+
++------------+  +-->|                  |    |         |
+                    | :L fanin [Order] |--->| [stage] |
++------------+  +-->|                  |    |         |
+|            |  |   +------------------+    +---------+
+|  [stage]   |--+
+|            |
++------------+
+</pre>
+
+Example :
+
+hydro:
+<pre>
+| odd a:
+| :b fanin
+?
+| :a fun(X) -> {map, X * 10} end
+| b:
+</pre>
+
+erlang:
+<pre>
+hydrologic:new(
+  test,
+  [
+   {odd, a},
+   {b, fanin},
+   return,
+   {a, fun(X) ->
+           {map, X * 10}
+       end},
+   b
+  ]
+ )
+</pre>
 
 <h3>STDLIB</h3>
 

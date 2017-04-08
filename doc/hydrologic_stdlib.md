@@ -9,7 +9,7 @@
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#between-3">between/3</a></td><td></td></tr><tr><td valign="top"><a href="#chop-2">chop/2</a></td><td></td></tr><tr><td valign="top"><a href="#console-1">console/1</a></td><td></td></tr><tr><td valign="top"><a href="#console-2">console/2</a></td><td></td></tr><tr><td valign="top"><a href="#count-2">count/2</a></td><td></td></tr><tr><td valign="top"><a href="#drop-3">drop/3</a></td><td></td></tr><tr><td valign="top"><a href="#duplicate-2">duplicate/2</a></td><td></td></tr><tr><td valign="top"><a href="#even-1">even/1</a></td><td></td></tr><tr><td valign="top"><a href="#flatten-1">flatten/1</a></td><td></td></tr><tr><td valign="top"><a href="#from-2">from/2</a></td><td></td></tr><tr><td valign="top"><a href="#head-2">head/2</a></td><td></td></tr><tr><td valign="top"><a href="#match-2">match/2</a></td><td></td></tr><tr><td valign="top"><a href="#odd-1">odd/1</a></td><td></td></tr><tr><td valign="top"><a href="#pad-3">pad/3</a></td><td></td></tr><tr><td valign="top"><a href="#pad-4">pad/4</a></td><td></td></tr><tr><td valign="top"><a href="#return-1">return/1</a></td><td></td></tr><tr><td valign="top"><a href="#sort-1">sort/1</a></td><td></td></tr><tr><td valign="top"><a href="#sum-1">sum/1</a></td><td></td></tr><tr><td valign="top"><a href="#tail-2">tail/2</a></td><td></td></tr><tr><td valign="top"><a href="#to-2">to/2</a></td><td></td></tr><tr><td valign="top"><a href="#unique-1">unique/1</a></td><td></td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#between-3">between/3</a></td><td></td></tr><tr><td valign="top"><a href="#chop-2">chop/2</a></td><td></td></tr><tr><td valign="top"><a href="#console-1">console/1</a></td><td></td></tr><tr><td valign="top"><a href="#console-2">console/2</a></td><td></td></tr><tr><td valign="top"><a href="#count-2">count/2</a></td><td></td></tr><tr><td valign="top"><a href="#drop-3">drop/3</a></td><td></td></tr><tr><td valign="top"><a href="#even-1">even/1</a></td><td></td></tr><tr><td valign="top"><a href="#flatten-1">flatten/1</a></td><td></td></tr><tr><td valign="top"><a href="#from-2">from/2</a></td><td></td></tr><tr><td valign="top"><a href="#head-2">head/2</a></td><td></td></tr><tr><td valign="top"><a href="#join-2">join/2</a></td><td></td></tr><tr><td valign="top"><a href="#match-2">match/2</a></td><td></td></tr><tr><td valign="top"><a href="#odd-1">odd/1</a></td><td></td></tr><tr><td valign="top"><a href="#pad-3">pad/3</a></td><td></td></tr><tr><td valign="top"><a href="#pad-4">pad/4</a></td><td></td></tr><tr><td valign="top"><a href="#repeat-2">repeat/2</a></td><td></td></tr><tr><td valign="top"><a href="#return-1">return/1</a></td><td></td></tr><tr><td valign="top"><a href="#sort-1">sort/1</a></td><td></td></tr><tr><td valign="top"><a href="#split-2">split/2</a></td><td></td></tr><tr><td valign="top"><a href="#sum-1">sum/1</a></td><td></td></tr><tr><td valign="top"><a href="#tail-2">tail/2</a></td><td></td></tr><tr><td valign="top"><a href="#to-2">to/2</a></td><td></td></tr><tr><td valign="top"><a href="#unique-1">unique/1</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
@@ -70,15 +70,6 @@ drop(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, X2::head
 </code></pre>
 <br />
 
-<a name="duplicate-2"></a>
-
-### duplicate/2 ###
-
-<pre><code>
-duplicate(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, N::non_neg_integer()) -&gt; {reduce, list()}
-</code></pre>
-<br />
-
 <a name="even-1"></a>
 
 ### even/1 ###
@@ -114,6 +105,12 @@ from(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, From::an
 head(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, N::non_neg_integer()) -&gt; {reduce, list()}
 </code></pre>
 <br />
+
+<a name="join-2"></a>
+
+### join/2 ###
+
+`join(Data, Item) -> any()`
 
 <a name="match-2"></a>
 
@@ -151,6 +148,15 @@ pad(Data::any(), X2::right | left, Size::non_neg_integer(), Char::integer()) -&g
 </code></pre>
 <br />
 
+<a name="repeat-2"></a>
+
+### repeat/2 ###
+
+<pre><code>
+repeat(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>, N::non_neg_integer()) -&gt; {reduce, list()}
+</code></pre>
+<br />
+
 <a name="return-1"></a>
 
 ### return/1 ###
@@ -168,6 +174,12 @@ return(Data::any()) -&gt; {return, any()}
 sort(Data::<a href="hydrologic.md#type-reduct">hydrologic:reduct()</a>) -&gt; {reduce, list()}
 </code></pre>
 <br />
+
+<a name="split-2"></a>
+
+### split/2 ###
+
+`split(Data, Tokens) -> any()`
 
 <a name="sum-1"></a>
 

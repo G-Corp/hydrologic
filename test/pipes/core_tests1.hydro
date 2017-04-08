@@ -1,0 +1,7 @@
+| fun(X) -> 2 * X end
+| duplicate :a
+| fun(X) -> 3 * X end
+| :b merge fun(X1, X2) -> X1 + X2 end
+?
+| :a fun(X) -> X + X end
+| b:

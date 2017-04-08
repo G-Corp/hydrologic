@@ -18,15 +18,9 @@ tokenize([H|Rest], Line, _Column, Tokens, _NL) when ?is_lf(H) ->
 tokenize([H|Rest], Line, Column, Tokens, NL) when ?is_space(H) ->
   tokenize(Rest, Line, Column + 1, Tokens, NL);
 
-% Pipe and return
-% tokenize([H|Rest], Line, Column, Tokens, true) when ?is_pipe_op(H) ->
-%   tokenize(Rest, Line, Column + 1, [{pipe, {Line, Column, Column + 1}}|Tokens], false);
-% tokenize([H|Rest], Line, Column, Tokens, true) when ?is_return_op(H) ->
-%   tokenize(Rest, Line, Column + 1, [{return, {Line, Column, Column + 1}}|Tokens], false);
-
 % IN
 tokenize([H|_] = String, Line, Column, Tokens, _NL) when ?is_in_out(H) ->
-  {Rest, Identifier, Size, _} = build_identifier(String, 0, []),
+  {Rest, [$:|Identifier], Size, _} = build_identifier(String, 0, []),
   tokenize(Rest, Line, Column + Size, [{in, {Line, Column, Column + Size}, Identifier}|Tokens], false);
 
 % Integer and floats
@@ -63,12 +57,17 @@ build_number(Rest, Acc, integer) ->
 build_identifier([H|Rest], Len, Current) when ?is_identifier_part(H) ->
   build_identifier(Rest, Len + 1, [H|Current]);
 build_identifier(Rest, Len, Current) ->
-  Identifier = list_to_atom(lists:reverse(Current)),
   case Current of
-    [X|_] when ?is_in_out(X) ->
-      {Rest, Identifier, Len, out};
+    [$:|Out] ->
+      {Rest, lists:reverse(Out), Len, out};
     _ ->
-      {Rest, Identifier, Len, reserved_word(Identifier)}
+      Identifier = lists:reverse(Current),
+      case erlang:length(string:tokens(Identifier, ":")) of
+        2 ->
+          {Rest, Identifier, Len, mf};
+        _ ->
+          {Rest, Identifier, Len, reserved_word(Identifier)}
+      end
   end.
 
 build_operator([H|Rest], Len, Current) when ?is_op(H) ->
@@ -78,9 +77,9 @@ build_operator(Rest, Len, Current) ->
 
 % Reserved
 
-reserved_word('duplicate') -> duplicate;
-reserved_word('merge') -> merge;
-reserved_word('fanin') -> fanin;
-reserved_word('fun') -> 'fun';
-reserved_word('end') -> 'end';
+reserved_word("duplicate") -> duplicate;
+reserved_word("merge") -> merge;
+reserved_word("fanin") -> fanin;
+reserved_word("fun") -> 'fun';
+reserved_word("end") -> 'end';
 reserved_word(_) -> identifier.

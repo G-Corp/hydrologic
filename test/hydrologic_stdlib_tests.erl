@@ -14,13 +14,39 @@ hydrologic_stdlib_test_() ->
     fun() ->
         meck:new(io, [passthrough, unstick]),
         meck:expect(io, format, fun(_Format, _Data) ->
-                                    %?debugFmt(Format, Data)
+                                    % ?debugFmt(Format, Data)
                                     ok
                                 end),
         hydrologic:new(test, [console]),
         Result = hydrologic:run(test, 10),
         ?assertEqual({ok, 10}, Result),
         ?assertCall(io, format, 2, 1),
+        hydrologic:stop(test),
+        meck:unload(io)
+    end,
+    fun() ->
+        meck:new(io, [passthrough, unstick]),
+        meck:expect(io, format, fun(_Format, _Data) ->
+                                    % ?debugFmt(Format, Data)
+                                    ok
+                                end),
+        hydrologic:new(test, [console]),
+        Result = hydrologic:run(test, [10, 20, 30]),
+        ?assertEqual({ok, [10, 20, 30]}, Result),
+        ?assertCall(io, format, 2, 3),
+        hydrologic:stop(test),
+        meck:unload(io)
+    end,
+    fun() ->
+        meck:new(io, [passthrough, unstick]),
+        meck:expect(io, format, fun(_Format, _Data) ->
+                                    % ?debugFmt(Format, Data)
+                                    ok
+                                end),
+        hydrologic:new(test, [console]),
+        Result = hydrologic:run(test, []),
+        ?assertEqual({ok, []}, Result),
+        ?assertCall(io, format, 2, 0),
         hydrologic:stop(test),
         meck:unload(io)
     end,
@@ -53,6 +79,10 @@ hydrologic_stdlib_test_() ->
         ?assertEqual({ok, <<"hello world">>}, hydrologic:run(test, <<"hello world">>)),
         ?assertEqual({ok, 'hello world'}, hydrologic:run(test, 'hello world')),
         ?assertEqual(ok, hydrologic:run(test, "hola mundo")),
+        ?assertEqual({ok, ["world"]},
+                     hydrologic:run(test, ["hello", "world"])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -82,12 +112,31 @@ hydrologic_stdlib_test_() ->
         hydrologic:new(
           test,
           [
+           {{match, ["world"]}, a},
+           fun string:to_upper/1,
+           {a, fanin},
+           return
+          ]
+         ),
+        ?assertEqual(
+           {ok, ["hello", "WORLD", "of", "love"]},
+           hydrologic:run(test, ["hello", "world", "of", "love"])),
+        hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [
            {pad, [10, $.]}
           ]
          ),
         ?assertEqual({ok, "hello....."}, hydrologic:run(test, "hello")),
         ?assertEqual({ok, <<"hello.....">>}, hydrologic:run(test, <<"hello">>)),
         ?assertEqual({ok, 'hello.....'}, hydrologic:run(test, 'hello')),
+        ?assertEqual({ok, ["hello.....", <<"world.....">>, 'love......']},
+                     hydrologic:run(test, ["hello", <<"world">>, love])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -100,6 +149,10 @@ hydrologic_stdlib_test_() ->
         ?assertEqual({ok, "hello....."}, hydrologic:run(test, "hello")),
         ?assertEqual({ok, <<"hello.....">>}, hydrologic:run(test, <<"hello">>)),
         ?assertEqual({ok, 'hello.....'}, hydrologic:run(test, 'hello')),
+        ?assertEqual({ok, ["hello.....", <<"world.....">>, 'love......']},
+                     hydrologic:run(test, ["hello", <<"world">>, love])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -112,6 +165,10 @@ hydrologic_stdlib_test_() ->
         ?assertEqual({ok, ".....hello"}, hydrologic:run(test, "hello")),
         ?assertEqual({ok, <<".....hello">>}, hydrologic:run(test, <<"hello">>)),
         ?assertEqual({ok, '.....hello'}, hydrologic:run(test, 'hello')),
+        ?assertEqual({ok, [".....hello", <<".....world">>, '......love']},
+                     hydrologic:run(test, ["hello", <<"world">>, love])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -127,6 +184,10 @@ hydrologic_stdlib_test_() ->
         ?assertEqual({ok, "hello"}, hydrologic:run(test, "hello")),
         ?assertEqual({ok, <<"hello">>}, hydrologic:run(test, <<"hello">>)),
         ?assertEqual({ok, 'hello'}, hydrologic:run(test, 'hello')),
+        ?assertEqual({ok, ["hello w", <<"hello w">>, 'hello w']},
+                     hydrologic:run(test, ["hello world", <<"hello world">>, 'hello world'])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -135,6 +196,14 @@ hydrologic_stdlib_test_() ->
           [even]),
         ?assertEqual({ok, [2, 4]},
                      hydrologic:run(test, [1, 2, 3, 4])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [1, 3, 5])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, 2},
+                     hydrologic:run(test, 2)),
+        ?assertEqual(ok,
+                     hydrologic:run(test, 1)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -168,6 +237,14 @@ hydrologic_stdlib_test_() ->
           [odd]),
         ?assertEqual({ok, [1, 3]},
                      hydrologic:run(test, [1, 2, 3, 4])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [2, 4, 6])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, 3},
+                     hydrologic:run(test, 3)),
+        ?assertEqual(ok,
+                     hydrologic:run(test, 2)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -202,6 +279,10 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, 1+2+3+4},
                      hydrologic:run(test, [1, 2, 3, 4])),
+        % TODO BUG ?assertEqual({ok, 0},
+        % TODO BUG              hydrologic:run(test, [])),
+        ?assertEqual({ok, 4},
+                     hydrologic:run(test, 4)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -211,6 +292,10 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, [1, 2, 3, 4]},
                      hydrologic:run(test, [4, 2, 1, 3])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [4]},
+                     hydrologic:run(test, 4)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -220,6 +305,29 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, 21},
                      hydrologic:run(test, ["hello\nworld", "hola mundo"])),
+        ?assertEqual({ok, 20},
+                     hydrologic:run(test, ["hello\nworld", <<"hola">>, 'mundo'])),
+        ?assertEqual({ok, 11},
+                     hydrologic:run(test, "hello\nworld")),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, <<"">>)),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, '')),
+        % TODO BUG ?assertEqual({ok, 0},
+        % TODO BUG              hydrologic:run(test, "")),
+        hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [{join, [", "]}]
+         ),
+        ?assertEqual({ok, "hello, world, love"},
+                     hydrologic:run(test, ["hello", "world", "love"])),
+        ?assertEqual({ok, "hello"},
+                     hydrologic:run(test, "hello")),
+        ?assertEqual({ok, ""},
+                     hydrologic:run(test, [])),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -229,6 +337,22 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, 3},
                      hydrologic:run(test, ["hello\nworld", "hola mundo"])),
+        ?assertEqual({ok, 4},
+                     hydrologic:run(test, ["hello\nworld", <<"hola">>, 'mundo'])),
+        ?assertEqual({ok, 2},
+                     hydrologic:run(test, "hello\nworld")),
+        ?assertEqual({ok, 2},
+                     hydrologic:run(test, <<"hello\nworld">>)),
+        ?assertEqual({ok, 2},
+                     hydrologic:run(test, 'hello\nworld')),
+        ?assertEqual({ok, 1},
+                     hydrologic:run(test, "hello")),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, <<"">>)),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, '')),
+        % TODO BUG ?assertEqual({ok, 0},
+        % TODO BUG              hydrologic:run(test, "")),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -238,6 +362,24 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, 4},
                      hydrologic:run(test, ["hello\nworld", "hola mundo"])),
+        ?assertEqual({ok, 4},
+                     hydrologic:run(test, ["hello\nworld", <<"hola">>, 'mundo'])),
+        ?assertEqual({ok, 2},
+                     hydrologic:run(test, "hello\nworld")),
+        ?assertEqual({ok, 2},
+                     hydrologic:run(test, "hello world")),
+        ?assertEqual({ok, 2},
+                     hydrologic:run(test, <<"hello world">>)),
+        ?assertEqual({ok, 2},
+                     hydrologic:run(test, 'hello world')),
+        ?assertEqual({ok, 1},
+                     hydrologic:run(test, "hello")),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, <<"">>)),
+        ?assertEqual({ok, 0},
+                     hydrologic:run(test, '')),
+        % TODO BUG ?assertEqual({ok, 0},
+        % TODO BUG              hydrologic:run(test, "")),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -247,6 +389,12 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, [3, 4, 5]},
                      hydrologic:run(test, [1, 2, 3, 4, 5])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [3]},
+                     hydrologic:run(test, 3)),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, 4)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -256,6 +404,12 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, [1, 2, 3]},
                      hydrologic:run(test, [1, 2, 3, 4, 5])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [3]},
+                     hydrologic:run(test, 3)),
+        ?assertEqual({ok, [4]},
+                     hydrologic:run(test, 4)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -265,6 +419,10 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, [1, 2, 3]},
                      hydrologic:run(test, [1, 1, 2, 2, 3, 1, 2, 3, 3, 3])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [1]},
+                     hydrologic:run(test, 1)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -274,6 +432,12 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, [1, 2, 3]},
                      hydrologic:run(test, [1, 2, 3, 4, 5, 6, 7, 8, 9])),
+        ?assertEqual({ok, [1, 2]},
+                     hydrologic:run(test, [1, 2])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [1]},
+                     hydrologic:run(test, 1)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -283,6 +447,10 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, []},
                      hydrologic:run(test, [1, 2, 3, 4, 5, 6, 7, 8, 9])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, 1)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -292,6 +460,12 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, [7, 8, 9]},
                      hydrologic:run(test, [1, 2, 3, 4, 5, 6, 7, 8, 9])),
+        ?assertEqual({ok, [1, 2]},
+                     hydrologic:run(test, [1, 2])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [1]},
+                     hydrologic:run(test, 1)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -301,6 +475,10 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, []},
                      hydrologic:run(test, [1, 2, 3, 4, 5, 6, 7, 8, 9])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, 1)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -310,6 +488,14 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, [4, 5, 6]},
                      hydrologic:run(test, [1, 2, 3, 4, 5, 6])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [1, 2, 3])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [1, 2])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [1]}, % TODO BUG must be {ok, []}
+                     hydrologic:run(test, 1)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -319,6 +505,14 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, [1, 2, 3]},
                      hydrologic:run(test, [1, 2, 3, 4, 5, 6])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [1, 2, 3])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [1, 2])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [1]}, % TODO BUG must be {ok, []}
+                     hydrologic:run(test, 1)),
         hydrologic:stop(test)
     end,
     fun() ->
@@ -328,21 +522,29 @@ hydrologic_stdlib_test_() ->
          ),
         ?assertEqual({ok, [1, 2, 3, 4, 5, 6, 7]},
                      hydrologic:run(test, [1, [2, 3], [4, [5, [6, 7]]]])),
+        ?assertEqual({ok, [1, 2, 3, 4, 5, 6, 7]},
+                     hydrologic:run(test, [1, 2, 3, 4, 5, 6, 7])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [1]},
+                     hydrologic:run(test, 1)),
         hydrologic:stop(test)
     end,
     fun() ->
         hydrologic:new(
           test,
-          [{duplicate, [3]}]
+          [{repeat, [3]}]
          ),
         ?assertEqual({ok, [a, a, a, b, b, b, c, c, c]},
                      hydrologic:run(test, [a, b, c])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
         hydrologic:stop(test)
     end,
     fun() ->
         hydrologic:new(
           test,
-          [{duplicate, [3]}]
+          [{repeat, [3]}]
          ),
         ?assertEqual({ok, [a, a, a]},
                      hydrologic:run(test, a)),
@@ -352,12 +554,61 @@ hydrologic_stdlib_test_() ->
         hydrologic:new(
           test,
           [
-           {duplicate, [3]},
+           {repeat, [3]},
            unique
           ]
          ),
         ?assertEqual({ok, [a]},
                      hydrologic:run(test, a)),
+        hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [unique]
+         ),
+        ?assertEqual({ok, [1, 2, 3]},
+                     hydrologic:run(test, [1, 1, 2, 2, 3, 3, 1, 2, 3])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        ?assertEqual({ok, [1]},
+                     hydrologic:run(test, 1)),
+        hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [{between, [3, 5]}]
+         ),
+        ?assertEqual(ok,
+                     hydrologic:run(test, 2)),
+        ?assertEqual({ok, 3},
+                     hydrologic:run(test, 3)),
+        ?assertEqual({ok, 4},
+                     hydrologic:run(test, 4)),
+        ?assertEqual({ok, 5},
+                     hydrologic:run(test, 5)),
+        ?assertEqual(ok,
+                     hydrologic:run(test, 6)),
+        ?assertEqual({ok, [3, 4, 5]},
+                     hydrologic:run(test, [1, 2, 3, 4, 5, 6, 7])),
+        ?assertEqual({ok, []},
+                     hydrologic:run(test, [])),
+        hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [
+           {{between, [3, 5]}, a},
+           fun(X) -> X * X end,
+           {a, fanin}
+          ]
+         ),
+        ?assertEqual({ok, [1, 2, 9, 16, 25, 6, 7]},
+                     hydrologic:run(test, [1, 2, 3, 4, 5, 6, 7])),
+        % TODO BUG ?assertEqual({ok, []},
+        % TODO BUG              hydrologic:run(test, [])),
         hydrologic:stop(test)
     end
    ]}.

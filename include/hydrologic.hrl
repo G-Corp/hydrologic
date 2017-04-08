@@ -11,3 +11,7 @@
                        (is_tuple(X) andalso (size(X) == 3 orelse size(X) == 2)) orelse
                        is_atom(X))).
 
+-define(FLOW(Data), (erlang:is_list(Data) andalso
+                     not bucs:is_string(Data)) orelse
+                    bucs:is_list_of_lists(Data)).
+

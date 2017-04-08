@@ -12,8 +12,6 @@
               reduct/0
              ]).
 
--define(FLOW(Data), (erlang:is_list(Data) andalso not bucs:is_string(Data)) orelse bucs:is_list_of_lists(Data)).
-
 -type operation() :: term().
 -type pipe() :: atom().
 -type data() :: any().
@@ -130,9 +128,9 @@ worker(fanin, PID, EndPID) when ?IS_RECEIVER(PID),
                                 ?IS_RECEIVER(EndPID) ->
   worker({fanin, 0}, PID, EndPID);
 worker({fanin, 0}, PID, EndPID) ->
-  worker({merge, fun(X, _) -> {map, X} end}, PID, EndPID);
+  worker({merge, fun(X, _) -> X end}, PID, EndPID);
 worker({fanin, 1}, PID, EndPID) ->
-  worker({merge, fun(_, X) -> {map, X} end}, PID, EndPID);
+  worker({merge, fun(_, X) -> X end}, PID, EndPID);
 worker({duplicate, AltPID}, PID, EndPID) when ?IS_RECEIVER(AltPID),
                                               ?IS_RECEIVER(PID),
                                               ?IS_RECEIVER(EndPID) ->
@@ -309,6 +307,8 @@ flow_response(PID, EndPID, #{data := Data} = Record, Function) ->
           EndPID ! Record#{data => NewData};
         {error, Error} ->
           EndPID ! Record#{error => Error};
+        {'$', _, _} ->
+          PID ! Record;
         {_, Data} ->
           PID ! Record
       end;
@@ -330,6 +330,8 @@ flow_response(PID, AltPID, EndPID, #{data := Data} = Record, Function) ->
           EndPID ! Record#{data => NewData};
         {error, Error} ->
           EndPID ! Record#{error => Error};
+        {'$', _, _} ->
+          PID ! Record;
         {_, Data} ->
           PID ! Record
       end;
