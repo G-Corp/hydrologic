@@ -8,7 +8,6 @@ __Version:__ 0.0.1
 
 __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.lejeune@gmail.com)).
 
-<a name="streams"></a>
 
 ### Streams ###
 
@@ -24,8 +23,8 @@ TODO
 original records to the next output stream, and the copy to a second stream.
 
 __Syntax:__<br />
-_hydro:_`duplicate <Label>:`<br />
-_erlang:_`{duplicate Label :: atom()}`
+_hydro:_ `duplicate <Label>:`<br />
+_erlang:_ `{duplicate Label :: atom()}`
 
 __Availability:__ _record_, _list_
 
@@ -91,8 +90,8 @@ hydrologic:new(
 `merge` send all records from the input streams to a function that will return a combined record and send it to the output stream.
 
 __Syntax:__<br />
-_hydro:_`:<Label> merge <Function>`<br />
-_erlang:_`{Label :: atom(), {merge, Function :: function(2)}}`
+_hydro:_ `:<Label> merge <Function>`<br />
+_erlang:_ `{Label :: atom(), {merge, Function :: function(2)}}`
 
 __Availability:__ _record_, _list_
 
@@ -158,8 +157,8 @@ hydrologic:new(
 `fanin` reassemble the input streams.
 
 __Syntax :__<br />
-_hydro:_`:<Label> fanin [0|1]`<br />
-_erlang:_`{Label :: atom(), fanin} | {Label :: atom(), {fanin, 0 | 1}}`
+_hydro:_ `:<Label> fanin [0|1]`<br />
+_erlang:_ `{Label :: atom(), fanin} | {Label :: atom(), {fanin, 0 | 1}}`
 
 __Availability:__ _list_
 
@@ -216,33 +215,178 @@ hydrologic:new(
 
 ### STDLIB ###
 
-`console` (map)
 
-`{console, [Format :: string()]}` (map)
+#### return ####
 
-`{match, [Regex :: string()]}` (filter)
+`return` terminate the current stream.
 
-`{pad, [Direction :: left | right, Size :: integer(), Char :: integer()]} | {pad, [Size :: integer(), Char :: integer()]}` (map)
+__Syntax:__<br />
+_hydro:_ `return | ?`<br />
+_erlang:_ `return`
 
-`{chop, [Size :: integer()]}` (map)
-
-`{between, [Min :: string(), Max :: string()]}` (filter)
-
-`odd` (filter)
-
-`even` (filter)
-
-
-### Create a worker ###
+__Availability:__ _record_, _list_
 
 ```
 
--spec worker(data(), ...) -> {map, data()}
-                        | data()
-                        | {filter, true | false}
-                        | {return, data()}
-                        | {error, term()}.
--spec worker(data(), accumulator(), ...) -> {reduce, accumulator()}.
++---------+    +--------+
+|         |    |        |
+| [stage] |--->| return |
+|         |    |        |
++---------+    +--------+
+
+```
+
+Example :
+
+hydro:
+
+```
+
+% sample.hydro
+
+| even a:
+? :b
+| :a fun(X) -> X + 1 end
+| b:
+
+```
+erlang:
+
+```
+
+hydrologic:new(
+  sample,
+  [
+    {even, a},
+    {b, return},
+    {a, {fun(X) -> X + 1 end}}
+    b
+  ]
+ )
+
+```
+
+
+#### console ####
+
+`console` print the current stream on the strandard output.
+
+__Syntax:__<br />
+_hydro:_ `console [io:format()]`<br />
+_erlang:_ `console | {console [io:format()]}`
+
+For `io:format()`, see [io:format/2](http://erlang.org/doc/man/io.md#format-2).
+
+__Availability:__ _record_, _list_
+
+```
+
++---------+    +----------------+    +---------+
+|         |    |                |    |         |
+| [stage] |--->| console Format |--->| [stage] |
+|         |    |                |    |         |
++---------+    +----------------+    +---------+
+
+```
+
+Example :
+
+hydro:
+
+```
+
+% sample.hydro
+
+| console "Value = ~p"
+?
+
+```
+erlang:
+
+```
+
+hydrologic:new(
+  sample,
+  [
+    {console, "Value = ~p"}
+  ]
+ )
+
+```
+
+
+#### sort ####
+
+
+#### from ####
+
+
+#### to ####
+
+
+#### unique ####
+
+
+#### head ####
+
+
+#### tail ####
+
+
+#### drop ####
+
+
+#### flatten ####
+
+
+#### repeat ####
+
+
+#### match ####
+
+
+#### pad ####
+
+
+#### chop ####
+
+
+#### between ####
+
+
+#### count ####
+
+
+#### join ####
+
+
+#### split ####
+
+
+#### odd ####
+
+
+#### even ####
+
+
+#### sum ####
+
+
+### Create a stage ###
+
+```
+
+-spec fun(data(), ...) -> {map, data()}
+                          | data()
+                          | {filter, true | false}
+                          | {return, data()}
+                          | {error, term()}.
+
+-spec fun('__empty__'
+          | data()
+          | {data(), accumulator()}
+          | {'__end__', accumulator()}
+          , ...) -> {reduce, accumulator()};
 
 ```
 
@@ -293,10 +437,17 @@ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED WAR
 
 
 ### TODO ###
-* STDLIB: split Pattern - (map, elem->list)
-* STDLIB: join Separator - (map, list->elem)
-* STDLIB: strip left|right|both - (map, elem)
-* STDLIB: replace Regex Repl - (map, elem)
+
+* [ ] (STDLIB) strip left|right|both - (map, elem)
+
+* [ ] (STDLIB) replace Regex Repl - (map, elem)
+
+* [ ] .hydro compiler
+
+* [ ] rebar3 plugin for the .hydro compiler
+
+* [ ] erlang.mk plugin for the .hydro compiler
+
 
 
 ## Modules ##

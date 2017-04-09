@@ -46,7 +46,7 @@ pipe() = atom()
 
 
 <pre><code>
-reduct() = <a href="#type-data">data()</a> | {<a href="#type-data">data()</a>, any()} | {'__end__', any()}
+reduct() = '__empty__' | <a href="#type-data">data()</a> | {<a href="#type-data">data()</a>, any()} | {'__end__', any()}
 </code></pre>
 
 <a name="index"></a>

@@ -4,7 +4,7 @@
 @title Hydrologic - A pipeline system
 @doc
 
-<a name="streams"></a><h3>Streams</h3>
+<h3>Streams</h3>
 
 TODO
 
@@ -16,8 +16,8 @@ TODO
 original records to the next output stream, and the copy to a second stream.
 
 <b>Syntax: </b><br />
-<i>hydro: </i><tt>duplicate &lt;Label&gt;:</tt><br />
-<i>erlang: </i><tt>{duplicate Label :: atom()}</tt>
+<i>hydro:</i> <tt>duplicate &lt;Label&gt;:</tt><br />
+<i>erlang:</i> <tt>{duplicate Label :: atom()}</tt>
 
 <b>Availability:</b> <i>record</i>, <i>list</i>
 
@@ -75,8 +75,8 @@ hydrologic:new(
 <tt>merge</tt> send all records from the input streams to a function that will return a combined record and send it to the output stream.
 
 <b>Syntax:</b><br />
-<i>hydro: </i><tt>:&lt;Label&gt; merge &lt;Function&gt;</tt><br />
-<i>erlang: </i><tt>{Label :: atom(), {merge, Function :: function(2)}}</tt>
+<i>hydro:</i> <tt>:&lt;Label&gt; merge &lt;Function&gt;</tt><br />
+<i>erlang:</i> <tt>{Label :: atom(), {merge, Function :: function(2)}}</tt>
 
 <b>Availability:</b> <i>record</i>, <i>list</i>
 
@@ -134,8 +134,8 @@ hydrologic:new(
 <tt>fanin</tt> reassemble the input streams.
 
 <b>Syntax :</b><br />
-<i>hydro: </i><tt>:&lt;Label&gt; fanin [0|1]</tt><br />
-<i>erlang: </i><tt>{Label :: atom(), fanin} | {Label :: atom(), {fanin, 0 | 1}}</tt>
+<i>hydro:</i> <tt>:&lt;Label&gt; fanin [0|1]</tt><br />
+<i>erlang:</i> <tt>{Label :: atom(), fanin} | {Label :: atom(), {fanin, 0 | 1}}</tt>
 
 <b>Availability:</b> <i>list</i>
 
@@ -184,31 +184,143 @@ hydrologic:new(
 
 <h3>STDLIB</h3>
 
-<tt>console</tt> (map)
+<h4>return</h4>
 
-<tt>{console, [Format :: string()]}</tt> (map)
+<tt>return</tt> terminate the current stream.
 
-<tt>{match, [Regex :: string()]}</tt> (filter)
+<b>Syntax:</b><br />
+<i>hydro:</i> <tt>return | ?</tt><br />
+<i>erlang:</i> <tt>return</tt>
 
-<tt>{pad, [Direction :: left | right, Size :: integer(), Char :: integer()]} | {pad, [Size :: integer(), Char :: integer()]}</tt> (map)
-
-<tt>{chop, [Size :: integer()]}</tt> (map)
-
-<tt>{between, [Min :: string(), Max :: string()]}</tt> (filter)
-
-<tt>odd</tt> (filter)
-
-<tt>even</tt> (filter)
-
-<h3>Create a worker</h3>
+<b>Availability:</b> <i>record</i>, <i>list</i>
 
 <pre>
--spec worker(data(), ...) -> {map, data()}
-                        | data()
-                        | {filter, true | false}
-                        | {return, data()}
-                        | {error, term()}.
--spec worker(data(), accumulator(), ...) -> {reduce, accumulator()}.
++---------+    +--------+
+|         |    |        |
+| [stage] |--->| return |
+|         |    |        |
++---------+    +--------+
+</pre>
+
+Example :
+
+hydro:
+<pre>
+% sample.hydro
+
+| even a:
+? :b
+| :a fun(X) -> X + 1 end
+| b:
+</pre>
+
+erlang:
+<pre>
+hydrologic:new(
+  sample,
+  [
+    {even, a},
+    {b, return},
+    {a, {fun(X) -> X + 1 end}}
+    b
+  ]
+ )
+</pre>
+
+<h4>console</h4>
+
+<tt>console</tt> print the current stream on the strandard output.
+
+<b>Syntax:</b><br />
+<i>hydro:</i> <tt>console [io:format()]</tt><br />
+<i>erlang:</i> <tt>console | {console [io:format()]}</tt>
+
+For <tt>io:format()</tt>, see <a href="http://erlang.org/doc/man/io.html#format-2">io:format/2</a>.
+
+<b>Availability:</b> <i>record</i>, <i>list</i>
+
+<pre>
++---------+    +----------------+    +---------+
+|         |    |                |    |         |
+| [stage] |--->| console Format |--->| [stage] |
+|         |    |                |    |         |
++---------+    +----------------+    +---------+
+</pre>
+
+Example :
+
+hydro:
+<pre>
+% sample.hydro
+
+| console "Value = ~p"
+?
+</pre>
+
+erlang:
+<pre>
+hydrologic:new(
+  sample,
+  [
+    {console, "Value = ~p"}
+  ]
+ )
+</pre>
+
+<h4>sort</h4>
+
+<h4>from</h4>
+
+<h4>to</h4>
+
+<h4>unique</h4>
+
+<h4>head</h4>
+
+<h4>tail</h4>
+
+<h4>drop</h4>
+
+<h4>flatten</h4>
+
+<h4>repeat</h4>
+
+<h4>match</h4>
+
+<h4>pad</h4>
+
+<h4>chop</h4>
+
+<h4>between</h4>
+
+<h4>count</h4>
+
+<h4>join</h4>
+
+<h4>split</h4>
+
+<h4>odd</h4>
+
+<h4>even</h4>
+
+<h4>sum</h4>
+
+
+
+<h3>Create a stage</h3>
+
+<pre>
+-spec fun(data(), ...) -> {map, data()}
+                          | data()
+                          | {filter, true | false}
+                          | {return, data()}
+                          | {error, term()}.
+
+-spec fun('__empty__'
+          | data()
+          | {data(), accumulator()}
+          | {'__end__', accumulator()}
+          , ...) -> {reduce, accumulator()};
 </pre>
 
 <h3>Examples</h3>
@@ -264,7 +376,11 @@ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED WAR
 
 <h3>TODO</h3>
 
-* STDLIB: split Pattern - (map, elem->list)
-* STDLIB: join Separator - (map, list->elem)
-* STDLIB: strip left|right|both - (map, elem)
-* STDLIB: replace Regex Repl - (map, elem)
+<ul>
+<li>[ ] (STDLIB) strip left|right|both - (map, elem)</li>
+<li>[ ] (STDLIB) replace Regex Repl - (map, elem)</li>
+<li>[ ] .hydro compiler</li>
+<li>[ ] rebar3 plugin for the .hydro compiler</li>
+<li>[ ] erlang.mk plugin for the .hydro compiler</li>
+</ul>
+

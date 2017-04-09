@@ -15,7 +15,7 @@
 -type operation() :: term().
 -type pipe() :: atom().
 -type data() :: any().
--type reduct() :: data() | {data(), any()} | {'__end__', any()}.
+-type reduct() :: '__empty__' | data() | {data(), any()} | {'__end__', any()}.
 
 % @doc
 % Create a new pipe.
