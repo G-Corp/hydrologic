@@ -1,6 +1,12 @@
 -module(hydrologic_core_tests).
 -include_lib("eunit/include/eunit.hrl").
 
+-export([fun1/1, fun2/1, fun3/2, fun4/1]).
+fun1(X) -> 2*X.
+fun2(X) -> 3*X.
+fun3(X1, X2) -> X1 + X2.
+fun4(X) -> X + X.
+
 hydrologic_core_test_() ->
   {setup,
    fun() ->
@@ -24,6 +30,24 @@ hydrologic_core_test_() ->
            {a, fun(X) -> % 4 8 12
                    X + X
                end},
+           b
+          ]
+         ),
+        ?assertEqual({ok, 10}, hydrologic:run(test, 1)),
+        ?assertEqual({ok, 20}, hydrologic:run(test, 2)),
+        ?assertEqual({ok, 30}, hydrologic:run(test, 3)),
+        hydrologic:stop(test)
+    end,
+    fun() ->
+        hydrologic:new(
+          test,
+          [
+           {?MODULE, fun1, []}, % fun1(X) -> 2*X end
+           {duplicate, a},
+           {?MODULE, fun2, []}, % fun2(X) -> 3*X end
+           {b, {merge, {?MODULE, fun3, []}}}, % fun3(X1, X2) -> X1 + X2 end
+           return,
+           {a, {?MODULE, fun4, []}}, % fun4(X) -> X + X end
            b
           ]
          ),
